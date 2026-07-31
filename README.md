@@ -11,7 +11,7 @@
 
 Click below to download the complete standalone `.zip` package for Windows (64-bit):
 
-👉 **[⬇️ Download WorkCountdownWidget-v1.0.2-win64.zip](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.0.2/WorkCountdownWidget-v1.0.2-win64.zip)**
+👉 **[⬇️ Download WorkCountdownWidget-v1.0.3-win64.zip](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.0.3/WorkCountdownWidget-v1.0.3-win64.zip)**
 
 *Note: Extract the `.zip` file into any folder on your PC, then double-click `WorkCountdownWidget.exe` to run immediately!*
 
