@@ -11,7 +11,7 @@
 
 Click below to download the official compiled `.exe` for 64-bit Windows:
 
-👉 **[⬇️ Download WorkCountdownWidget-v1.0.0.exe](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.0.0/WorkCountdownWidget-v1.0.0-win64.exe)**
+👉 **[⬇️ Download WorkCountdownWidget-v1.0.1.exe](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.0.1/WorkCountdownWidget-v1.0.1-win64.exe)**
 
 ---
 
