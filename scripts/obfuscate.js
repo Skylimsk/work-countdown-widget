@@ -37,7 +37,7 @@ const OBFUSCATE_OPTIONS = {
   unicodeEscapeSequence: false,
 };
 
-const srcDir = __dirname;
+const srcDir = path.join(__dirname, '..', 'src');
 
 console.log('🔐 Obfuscating source files...');
 

@@ -23,6 +23,7 @@ let quotaCache = {
 function getRunnerPath() {
   const candidates = [
     path.join(process.resourcesPath, 'runner.py'),
+    path.join(__dirname, '..', 'scripts', 'runner.py'),
     path.join(__dirname, 'runner.py'),
     path.join(process.resourcesPath, 'app', 'runner.py'),
     path.join(process.resourcesPath, 'app.asar.unpacked', 'runner.py')

@@ -2,7 +2,7 @@
   "name": "work-countdown-widget",
   "version": "1.0.0",
   "description": "A sleek, floating desktop widget counting down to your work end time.",
-  "main": "main.js",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
     "build": "electron-builder --win dir"
@@ -26,7 +26,7 @@
     "productName": "WorkCountdownWidget",
     "win": {
       "target": "dir",
-      "icon": "icon.png"
+      "icon": "assets/icon.png"
     },
     "files": [
       "main.js",

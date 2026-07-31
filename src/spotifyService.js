@@ -10,6 +10,7 @@ const fs = require('fs');
 function getSpotifyScriptPath() {
   const candidates = [
     path.join(process.resourcesPath, 'spotify_now_playing.py'),
+    path.join(__dirname, '..', 'scripts', 'spotify_now_playing.py'),
     path.join(__dirname, 'spotify_now_playing.py'),
     path.join(process.resourcesPath, 'app', 'spotify_now_playing.py'),
   ];
