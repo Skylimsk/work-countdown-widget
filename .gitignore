@@ -1,0 +1,12 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+.DS_Store
+*.log
+*.exe
+*.bak
+user-config.json
+widget-debug.log
+.env
+

@@ -1,0 +1,43 @@
+{
+  "name": "work-countdown-widget",
+  "version": "1.0.0",
+  "description": "A sleek, floating desktop widget counting down to your work end time.",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder --win dir"
+  },
+  "keywords": [
+    "countdown",
+    "work",
+    "widget",
+    "electron",
+    "floating"
+  ],
+  "author": "Skylim",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "javascript-obfuscator": "^5.5.0"
+  },
+  "build": {
+    "appId": "com.skylim.workcountdownwidget",
+    "productName": "WorkCountdownWidget",
+    "win": {
+      "target": "dir",
+      "icon": "icon.png"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "store.js",
+      "index.html",
+      "style.css",
+      "icon.png"
+    ]
+  },
+  "dependencies": {
+    "node-telegram-bot-api": "^1.2.0"
+  }
+}

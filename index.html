@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Work End Time Floating Widget</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="widget-container" id="widgetContainer">
+    <!-- Top Header Bar (Removed btnTelegram so UI remains clean & non-cluttered) -->
+    <div class="drag-handle" id="headerBar">
+      <span class="status-indicator" id="statusDot" title="Status: Working"></span>
+      <span class="caffeine-indicator" id="caffeineIcon" title="Caffeine: Active">☕</span>
+      <span class="timer-text" id="timerDisplay"><span class="phase-emoji" id="phaseEmoji"></span><span class="phase-time" id="phaseTime">00:00:00</span></span>
+      <div class="window-controls">
+        <button class="control-btn" id="btnThemeToggle" title="Toggle Light / Dark Mode">🌙</button>
+        <button class="control-btn" id="btnQuotaToggle" title="Toggle AI Quotas Panel">📊</button>
+        <button class="control-btn" id="btnSettings" title="Settings">⚙️</button>
+        <button class="control-btn" id="btnMinimize" title="Minimize">–</button>
+        <button class="control-btn" id="btnClose" title="Close">✕</button>
+      </div>
+    </div>
+
+    <!-- Countdown / OT Progress Bar -->
+    <div class="progress-section" id="progressSection">
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+      <!-- Overtime (OT) Pay Indicator Row -->
+      <div class="ot-pay-row hidden" id="otPayRow">
+        <span class="ot-label">🔥 OT Pay:</span>
+        <span class="ot-money-val" id="otMoneyVal">+$0.00</span>
+      </div>
+    </div>
+
+    <!-- Spotify Now Playing Bar -->
+    <div class="spotify-bar" id="spotifyBar" style="display:none;">
+      <div class="spotify-main-row">
+        <div class="spotify-track-info">
+          <span class="spotify-icon">🎵</span>
+          <div class="spotify-text">
+            <span class="spotify-track" id="spotifyTrack">Not Playing</span>
+            <span class="spotify-artist" id="spotifyArtist"></span>
+          </div>
+        </div>
+        <div class="spotify-controls">
+          <button class="spotify-btn" id="btnSpotifyPrev" title="Previous">⏮</button>
+          <button class="spotify-btn" id="btnSpotifyPlay" title="Play/Pause">⏯</button>
+          <button class="spotify-btn" id="btnSpotifyNext" title="Next">⏭</button>
+        </div>
+      </div>
+      <!-- Song Progress Bar Row -->
+      <div class="spotify-progress-row">
+        <div class="spotify-progress-bg">
+          <div class="spotify-progress-fill" id="spotifyProgressFill"></div>
+        </div>
+        <span class="spotify-time" id="spotifyTimeText">0:00 / 0:00</span>
+      </div>
+    </div>
+
+    <!-- Universal AI Quotas Section -->
+    <div class="quota-section hidden" id="quotaSection">
+      
+      <!-- 1. Standalone Claude App -->
+      <div class="ai-app-card" id="sectionClaudeApp">
+        <div class="app-header">🧠 Claude (Standalone App)</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">Five Hour Limit (Remaining)</span>
+            <span class="quota-val" id="claudeSessionVal">100%</span>
+          </div>
+          <div class="reset-desc" id="claudeSessionReset">refresh in --</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="claudeSessionBar"></div>
+          </div>
+        </div>
+        <div class="quota-row" id="claudeWeeklyRow">
+          <div class="quota-label-group">
+            <span class="quota-name">Weekly Limit (Remaining)</span>
+            <span class="quota-val" id="claudeWeeklyVal">100%</span>
+          </div>
+          <div class="reset-desc" id="claudeWeeklyReset">refresh in --</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill weekly-fill" id="claudeWeeklyBar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Google Antigravity -->
+      <div class="ai-app-card" id="sectionAntigravityApp">
+        <div class="app-header">🚀 Google Antigravity</div>
+        <div class="sub-header">♊ Gemini Models</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">Five Hour Limit (Remaining)</span>
+            <span class="quota-val" id="agGeminiSessionVal">31%</span>
+          </div>
+          <div class="reset-desc" id="agGeminiSessionReset">refresh in 4h</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="agGeminiSessionBar"></div>
+          </div>
+        </div>
+        <div class="quota-row" id="agGeminiWeeklyRow">
+          <div class="quota-label-group">
+            <span class="quota-name">Weekly Limit (Remaining)</span>
+            <span class="quota-val" id="agGeminiWeeklyVal">70%</span>
+          </div>
+          <div class="reset-desc" id="agGeminiWeeklyReset">refresh in 5d 23h</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill weekly-fill" id="agGeminiWeeklyBar"></div>
+          </div>
+        </div>
+
+        <div class="sub-header" style="margin-top: 4px;">🧠 Claude & GPT Models</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">Five Hour Limit (Remaining)</span>
+            <span class="quota-val" id="agClaudeSessionVal">100%</span>
+          </div>
+          <div class="reset-desc" id="agClaudeSessionReset">refresh in 5h</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="agClaudeSessionBar"></div>
+          </div>
+        </div>
+        <div class="quota-row" id="agClaudeWeeklyRow">
+          <div class="quota-label-group">
+            <span class="quota-name">Weekly Limit (Remaining)</span>
+            <span class="quota-val" id="agClaudeWeeklyVal">100%</span>
+          </div>
+          <div class="reset-desc" id="agClaudeWeeklyReset">refresh in 7d</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill weekly-fill" id="agClaudeWeeklyBar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Cursor IDE -->
+      <div class="ai-app-card hidden" id="sectionCursorApp">
+        <div class="app-header">💻 Cursor IDE</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">Fast Requests (Remaining)</span>
+            <span class="quota-val" id="cursorFastVal">100%</span>
+          </div>
+          <div class="reset-desc" id="cursorFastReset">refresh in 12d</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="cursorFastBar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. ChatGPT (Plus / Team) -->
+      <div class="ai-app-card hidden" id="sectionChatgptApp">
+        <div class="app-header">🤖 ChatGPT (Plus / Team)</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">GPT-4o Quota (Remaining)</span>
+            <span class="quota-val" id="chatgptGpt4Val">100%</span>
+          </div>
+          <div class="reset-desc" id="chatgptReset">refresh in 3h</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="chatgptGpt4Bar"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. OpenAI / DeepSeek API Balances -->
+      <div class="ai-app-card hidden" id="sectionApiKeysApp">
+        <div class="app-header">⚡ Open API Services</div>
+        <div class="quota-row">
+          <div class="quota-label-group">
+            <span class="quota-name">DeepSeek Balance</span>
+            <span class="quota-val" id="apiDeepseekVal">$10.00</span>
+          </div>
+          <div class="reset-desc">Prepaid Balance</div>
+          <div class="progress-bar-bg mini">
+            <div class="progress-bar-fill session-fill" id="apiDeepseekBar" style="width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Settings Panel (Toggled) -->
+    <div class="settings-body hidden" id="settingsView">
+      <div class="section-title">⏱ Work Countdown</div>
+      <div class="form-group">
+        <label for="inputStartTime">Work Start:</label>
+        <input type="time" id="inputStartTime" value="09:00">
+      </div>
+      <div class="form-group">
+        <label for="inputEndTime">Work End:</label>
+        <input type="time" id="inputEndTime" value="18:00">
+      </div>
+      
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkEnableLunch" checked>
+        <label for="checkEnableLunch">Enable Lunch Break</label>
+      </div>
+
+      <div class="lunch-times" id="lunchTimesGroup">
+        <div class="form-group">
+          <label for="inputLunchStart">Start:</label>
+          <input type="time" id="inputLunchStart" value="12:00">
+        </div>
+        <div class="form-group">
+          <label for="inputLunchEnd">End:</label>
+          <input type="time" id="inputLunchEnd" value="13:00">
+        </div>
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">🔥 Overtime (OT) Mode</div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkEnableOt" checked>
+        <label for="checkEnableOt">Track Overtime & Extra Pay</label>
+      </div>
+
+      <!-- Salary Rate Type Selector (Hourly vs Monthly) -->
+      <div class="form-group">
+        <label for="selectSalaryType">Salary Basis:</label>
+        <select id="selectSalaryType" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; padding: 2px; font-size: 9px; width: 80px;">
+          <option value="hourly" style="background: #0f172a;">Hourly</option>
+          <option value="monthly" style="background: #0f172a;">Monthly</option>
+        </select>
+      </div>
+
+      <!-- Hourly Inputs -->
+      <div class="form-group" id="hourlyRateGroup">
+        <label for="inputHourlyRate">Hourly Rate ($/hr):</label>
+        <input type="number" id="inputHourlyRate" value="15" step="0.5" min="0" style="width: 70px;">
+      </div>
+
+      <!-- Monthly Inputs -->
+      <div id="monthlySalaryGroup" class="hidden" style="display: flex; flex-direction: column; gap: 4px;">
+        <div class="form-group">
+          <label for="inputMonthlySalary">Monthly Pay ($):</label>
+          <input type="number" id="inputMonthlySalary" value="3000" step="50" min="0" style="width: 70px;">
+        </div>
+        <div class="form-group">
+          <label for="inputWorkDaysMonth">Days / Month:</label>
+          <input type="number" id="inputWorkDaysMonth" value="22" step="1" min="1" max="31" style="width: 70px;">
+        </div>
+        <div class="form-group">
+          <label for="inputWorkHoursDay">Hours / Day:</label>
+          <input type="number" id="inputWorkHoursDay" value="8" step="0.5" min="1" max="24" style="width: 70px;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="inputOtMultiplier">OT Multiplier:</label>
+        <input type="number" id="inputOtMultiplier" value="1.5" step="0.1" min="1" style="width: 70px;">
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">🤖 Universal AI Platforms</div>
+      
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="platClaude" checked>
+        <label for="platClaude">🧠 Claude Desktop App</label>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="platAntigravity" checked>
+        <label for="platAntigravity">🚀 Google Antigravity</label>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="platCursor">
+        <label for="platCursor">💻 Cursor IDE</label>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="platChatgpt">
+        <label for="platChatgpt">🤖 ChatGPT (Plus / Team)</label>
+      </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="platApiKeys">
+        <label for="platApiKeys">⚡ DeepSeek / OpenAI API</label>
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">📱 Telegram Bot Integration</div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkEnableTelegramBot" checked>
+        <label for="checkEnableTelegramBot">Enable Telegram Bot (Always-On)</label>
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">🔑 Credentials & API Keys</div>
+      <div class="form-group">
+        <label for="inputCursorToken">Cursor Token:</label>
+        <input type="password" id="inputCursorToken" placeholder="WorkosCursorSessionToken...">
+      </div>
+      <div class="form-group">
+        <label for="inputDeepseekKey">DeepSeek API Key:</label>
+        <input type="password" id="inputDeepseekKey" placeholder="sk-...">
+      </div>
+
+      <div class="section-title" style="margin-top: 10px;">⚙️ Preferences</div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkShowQuota" checked>
+        <label for="checkShowQuota">Show AI Quotas Dashboard</label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkShowWeekly" checked>
+        <label for="checkShowWeekly">Show Weekly Limit Bars</label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkKeepAwake" checked>
+        <label for="checkKeepAwake">Caffeine (Keep PC Awake)</label>
+      </div>
+
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkAlwaysOnTop" checked>
+        <label for="checkAlwaysOnTop">Always Floating On Top</label>
+      </div>
+
+      <div class="settings-actions">
+        <button id="btnSaveSettings" class="btn-primary">Save Settings</button>
+      </div>
+    </div>
+
+    <!-- Automatic Overtime (OT) Confirmation Modal -->
+    <div class="ot-prompt-body hidden" id="otPromptView">
+      <div class="ot-prompt-overlay">
+        <span class="ot-prompt-title">⏰ Work Time Ended!</span>
+        <span class="ot-prompt-desc">Are you working OT today?</span>
+        <div class="ot-btn-group">
+          <button id="btnConfirmOtYes" class="btn-ot-yes">🔥 Yes, Start OT</button>
+          <button id="btnConfirmOtNo" class="btn-ot-no">🚪 No, Close App</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Work Completed Celebration Screen -->
+    <div class="celebration-body hidden" id="celebrationView">
+      <div class="celebration-overlay">
+        <span class="party-emoji">🎉 Work Done!</span>
+        <button id="btnDismissParty" class="btn-secondary">OK</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
