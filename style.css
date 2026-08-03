@@ -44,7 +44,7 @@ body[data-day="0"], body[data-day="6"] { --day-primary:#94a3b8; --day-secondary:
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 html, body {
-  width: 282px;
+  width: 100vw;
   overflow: hidden;
   background: transparent;
   font-family: 'Inter', -apple-system, sans-serif;
@@ -61,7 +61,7 @@ html, body {
 
 /* ─── Widget Container ───────────────────────────────────────── */
 .widget-container {
-  width: 282px;
+  width: 100%;
   background: var(--bg-base);
   background-image: radial-gradient(ellipse 220% 140% at 50% -10%, var(--day-bg-tint), transparent 65%);
   border: 1px solid var(--border);
