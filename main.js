@@ -30,13 +30,18 @@ let mouseJiggleInterval = null; // Teams keep-active mouse jiggle timer
 
 function configureAutoStart() {
   try {
-    const exePath = process.execPath;
-    execSync(`reg add "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v WorkCountdownWidget /t REG_SZ /d "${exePath}" /f`, { timeout: 5000, windowsHide: true });
-    writeLog(`AutoStart registered: ${exePath}`);
+    // Use Electron's native API — works correctly with Squirrel installer
+    app.setLoginItemSettings({
+      openAtLogin: true,
+      name: 'WorkCountdownWidget',
+      path: process.execPath
+    });
+    writeLog(`AutoStart registered via setLoginItemSettings: ${process.execPath}`);
   } catch (e) {
     writeLog(`AutoStart registration failed: ${e.message}`);
   }
 }
+
 
 function isWeekend() {
   const day = new Date().getDay();
@@ -273,6 +278,7 @@ function startMouseJiggle() {
   }, 3 * 60 * 1000); // Every 3 minutes
   writeLog('Caffeine ON: Mouse jiggle started (Teams will stay Active)');
 }
+
 
 function stopMouseJiggle() {
   if (mouseJiggleInterval) {

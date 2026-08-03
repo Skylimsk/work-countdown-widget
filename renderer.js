@@ -106,11 +106,11 @@ let currentTheme = config.theme || 'dark';
 function applyTheme(theme) {
   currentTheme = theme;
   if (theme === 'light') {
-    widgetContainer.classList.add('light-mode');
+    document.body.classList.add('light-mode');
     btnThemeToggle.textContent = '☀️';
     btnThemeToggle.title = 'Switch to Dark Mode';
   } else {
-    widgetContainer.classList.remove('light-mode');
+    document.body.classList.remove('light-mode');
     btnThemeToggle.textContent = '🌙';
     btnThemeToggle.title = 'Switch to Light Mode';
   }
