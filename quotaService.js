@@ -1,7 +1,7 @@
 const { execFile, exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
-const { fetchAntigravityRealQuota } = require('./agQuotaService');
+const { fetchAntigravityRealQuota, fetchCursorRealQuota } = require('./agQuotaService');
 
 const logFile = "C:\\Users\\skyli\\widget-debug.log";
 
@@ -16,8 +16,9 @@ let quotaCache = {
   claudeRunning: true,
   antigravityRunning: true,
   claude: { session: 0, weekly: 0, sessionReset: '', weeklyReset: '' },
-  antigravityGemini: { session: 100, weekly: 100, sessionResetHours: 4, sessionResetMins: 58, weeklyResetDays: 6 },
-  antigravityClaudeGpt: { session: 100, weekly: 100, sessionResetHours: 5, sessionResetMins: 0, weeklyResetDays: 7 },
+  antigravityGemini: { session: 100, weekly: 100, sessionResetText: '' },
+  antigravityClaudeGpt: { session: 100, weekly: 100, sessionResetText: '' },
+  cursor: { fastPct: 100, numRequests: 0, maxRequests: 500 },
   error: null
 };
 
@@ -42,7 +43,6 @@ function getRunnerPath() {
 
 function checkRunningProcesses() {
   return new Promise((resolve) => {
-    // Standard tasklist process name check (rock solid & instant)
     exec('tasklist /NH', (err, stdout) => {
       let claudeRunning = false;
       let antigravityRunning = false;
@@ -146,6 +146,24 @@ async function fetchClaudeQuota() {
             }
           } catch (agErr) {
             writeLog(`Antigravity real-time quota fetch warning: ${agErr}`);
+          }
+
+          // 3. Real-time Cursor Quota calculation
+          try {
+            const { loadConfig } = require('./store');
+            const cfg = loadConfig();
+            if (cfg && cfg.credentials && cfg.credentials.cursorToken) {
+              const curData = await fetchCursorRealQuota(cfg.credentials.cursorToken);
+              if (curData) {
+                quotaCache.cursor = {
+                  fastPct: curData.remainingPct,
+                  numRequests: curData.numRequests,
+                  maxRequests: curData.maxRequests
+                };
+              }
+            }
+          } catch (curErr) {
+            writeLog(`Cursor quota fetch warning: ${curErr}`);
           }
 
           quotaCache.error = null;

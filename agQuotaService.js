@@ -72,13 +72,13 @@ async function fetchAntigravityRealQuota() {
     const statusData = await apiRes.json();
     const models = (statusData.userStatus && statusData.userStatus.cascadeModelConfigData && statusData.userStatus.cascadeModelConfigData.clientModelConfigs) || [];
 
-    let geminiSession = 100;
-    let geminiWeekly = 100;
+    let geminiSession = null;
+    let geminiWeekly = null;
     let geminiSessionReset = '';
     let geminiWeeklyReset = '';
 
-    let claudeSession = 100;
-    let claudeWeekly = 100;
+    let claudeSession = null;
+    let claudeWeekly = null;
     let claudeSessionReset = '';
     let claudeWeeklyReset = '';
 
@@ -92,26 +92,32 @@ async function fetchAntigravityRealQuota() {
       const frac = q.remainingFraction !== undefined ? q.remainingFraction : (q.remainingPercentage !== undefined ? q.remainingPercentage / 100 : 0);
       const remainingPct = Math.round(frac * 100);
 
-      // Distinguish Gemini vs Claude/GPT models
+      // Extract Gemini models quota (prefer gemini-3.6-flash-high or first gemini model with valid remainingFraction)
       if (id.includes('gemini') || label.includes('gemini')) {
-        geminiSession = remainingPct;
-        if (q.resetTime) geminiSessionReset = q.resetTime;
-      } else if (id.includes('claude') || id.includes('gpt') || label.includes('claude') || label.includes('gpt')) {
-        claudeSession = remainingPct;
-        if (q.resetTime) claudeSessionReset = q.resetTime;
+        if (geminiSession === null || id.includes('gemini-3.6-flash-high') || id.includes('gemini-pro-agent')) {
+          geminiSession = remainingPct;
+          if (q.resetTime) geminiSessionReset = q.resetTime;
+        }
+      } 
+      // Extract Claude & GPT models quota
+      else if (id.includes('claude') || id.includes('gpt') || label.includes('claude') || label.includes('gpt')) {
+        if (claudeSession === null || id.includes('claude-sonnet-4-6')) {
+          claudeSession = remainingPct;
+          if (q.resetTime) claudeSessionReset = q.resetTime;
+        }
       }
     }
 
     return {
       gemini: {
-        session: geminiSession,
-        weekly: geminiWeekly,
+        session: geminiSession !== null ? geminiSession : 100,
+        weekly: geminiWeekly !== null ? geminiWeekly : 100,
         sessionReset: geminiSessionReset,
         weeklyReset: geminiWeeklyReset
       },
       claudeGpt: {
-        session: claudeSession,
-        weekly: claudeWeekly,
+        session: claudeSession !== null ? claudeSession : 0,
+        weekly: claudeWeekly !== null ? claudeWeekly : 100,
         sessionReset: claudeSessionReset,
         weeklyReset: claudeWeeklyReset
       }
@@ -121,4 +127,37 @@ async function fetchAntigravityRealQuota() {
   }
 }
 
-module.exports = { fetchAntigravityRealQuota };
+async function fetchCursorRealQuota(token) {
+  if (!token) return null;
+  try {
+    const formattedToken = token.startsWith('WorkosCursorSessionToken%3A') 
+      ? token 
+      : `WorkosCursorSessionToken%3A${token.replace('WorkosCursorSessionToken:', '').replace('WorkosCursorSessionToken%3A', '')}`;
+
+    const res = await fetch('https://www.cursor.com/api/usage', {
+      headers: {
+        'Cookie': `WorkosCursorSessionToken=${formattedToken}`,
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+      }
+    });
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    
+    // Parse Cursor API response: gpt4 / fast requests
+    const gpt4 = data['gpt-4'] || {};
+    const maxReqs = gpt4.maxRequestUsage || 500;
+    const numReqs = gpt4.numRequests || 0;
+    const remainingPct = Math.max(0, Math.min(100, Math.round(((maxReqs - numReqs) / maxReqs) * 100)));
+
+    return {
+      remainingPct,
+      numRequests: numReqs,
+      maxRequests: maxReqs
+    };
+  } catch (e) {
+    return null;
+  }
+}
+
+module.exports = { fetchAntigravityRealQuota, fetchCursorRealQuota };

@@ -210,13 +210,20 @@ html, body {
 .ot-label { font-size: 8.5px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.4px; }
 .ot-money-val { font-family: 'JetBrains Mono',monospace; font-size: 10px; font-weight: 700; color: var(--day-primary); transition: color var(--ease-slow); }
 
-/* ─── Spotify Bar ────────────────────────────────────────────── */
+/* ─── Spotify Floating Curved Card ────────────────────────────── */
 .spotify-bar {
-  padding: 6px 10px 5px;
-  background: rgba(255,255,255,0.018);
-  border-bottom: 1px solid var(--border);
+  margin: 6px 8px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: background var(--ease), border-color var(--ease), box-shadow var(--ease);
 }
-.spotify-main-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
+.spotify-main-row { display: flex; align-items: center; gap: 6px; }
 .spotify-track-info { display: flex; align-items: center; gap: 5px; flex: 1; overflow: hidden; }
 .spotify-icon {
   font-family: 'Segoe UI Emoji','Apple Color Emoji','Noto Color Emoji',sans-serif;
@@ -231,7 +238,7 @@ html, body {
 .spotify-track.marquee-active { text-overflow: clip; animation: spt-scroll 7s linear infinite; animation-delay: 0.8s; }
 
 .spotify-artist {
-  font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.55);
+  font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.7);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 128px;
 }
 .spotify-artist.marquee-active { text-overflow: clip; animation: spt-scroll 7s linear infinite; animation-delay: 1.2s; }
@@ -246,19 +253,19 @@ html, body {
 
 .spotify-controls { display: flex; gap: 1px; align-items: center; flex-shrink: 0; }
 .spotify-btn {
-  background: transparent; border: none; color: rgba(255,255,255,0.65);
+  background: transparent; border: none; color: rgba(255,255,255,0.85);
   cursor: pointer; font-size: 13px; font-family: 'Segoe UI Emoji','Apple Color Emoji',sans-serif;
   padding: 2px 3px; border-radius: var(--r-sm);
   transition: color var(--ease), transform var(--ease), background var(--ease);
   -webkit-app-region: no-drag;
 }
-.spotify-btn:hover { color: #fff; transform: scale(1.18); background: rgba(255,255,255,0.08); }
+.spotify-btn:hover { color: #fff; transform: scale(1.18); background: rgba(255,255,255,0.12); }
 .spotify-btn:active { transform: scale(0.88); }
 
-.spotify-progress-row { display: flex; align-items: center; gap: 7px; }
-.spotify-progress-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.12); border-radius: var(--r-pill); overflow: hidden; }
-.spotify-progress-fill { height: 100%; border-radius: var(--r-pill); background: var(--day-primary); transition: width 1s linear, background var(--ease-slow); }
-.spotify-time { font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,0.4); white-space: nowrap; flex-shrink: 0; }
+.spotify-progress-row { display: flex; align-items: center; gap: 7px; width: 100%; margin-top: 2px; }
+.spotify-progress-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: var(--r-pill); overflow: hidden; }
+.spotify-progress-fill { height: 100%; border-radius: var(--r-pill); background: var(--day-primary); }
+.spotify-time { font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,0.75); white-space: nowrap; flex-shrink: 0; }
 
 /* ─── AI Quota Section ──────────────────────────────────────── */
 .quota-section { border-bottom: 1px solid var(--border); max-height: 260px; overflow-y: auto; }

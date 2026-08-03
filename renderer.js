@@ -236,6 +236,18 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     agClaudeWeeklyVal.textContent = `${agcWeekly}%`;
     if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = agClaudeData.weeklyResetText ? `refresh in ${agClaudeData.weeklyResetText}` : 'refresh in --';
 
+    // 4. Render Cursor IDE
+    if (data.cursor) {
+      const cursorFastBar = document.getElementById('cursorFastBar');
+      const cursorFastVal = document.getElementById('cursorFastVal');
+      const cursorFastReset = document.getElementById('cursorFastReset');
+      if (cursorFastBar) cursorFastBar.style.width = `${data.cursor.fastPct}%`;
+      if (cursorFastVal) cursorFastVal.textContent = `${data.cursor.fastPct}%`;
+      if (cursorFastReset && data.cursor.numRequests !== undefined) {
+        cursorFastReset.textContent = `Used ${data.cursor.numRequests} / ${data.cursor.maxRequests} fast reqs`;
+      }
+    }
+
     applyQuotaLayout();
   }
 });
@@ -687,14 +699,17 @@ function setPlayIcon(playing) {
 }
 
 function tickSmoothProgress() {
-  if (spotifyIsPlaying && currentDurSec > 0) {
+  if (currentDurSec > 0) {
     const now = Date.now();
-    const dt = (now - lastSyncTime) / 1000;
-    const estPos = Math.min(currentDurSec, currentPosSec + dt);
+    const dt = spotifyIsPlaying ? (now - lastSyncTime) / 1000 : 0;
+    const estPos = Math.min(currentDurSec, Math.max(0, currentPosSec + dt));
     const pct = Math.min(100, Math.max(0, (estPos / currentDurSec) * 100));
 
     spotifyProgressFill.style.width = `${pct}%`;
     spotifyTimeText.textContent = `${formatSecs(estPos)} / ${formatSecs(currentDurSec)}`;
+  } else {
+    spotifyProgressFill.style.width = '0%';
+    spotifyTimeText.textContent = '0:00 / 0:00';
   }
   animFrameId = requestAnimationFrame(tickSmoothProgress);
 }
@@ -715,13 +730,15 @@ function updateSpotifyUI(data) {
   }
   
   const titleColor = data.fgTitle || '#ffffff';
+  const artistColor = data.fgArtist || 'rgba(255,255,255,0.8)';
   const accentColor = data.accentColor || '#38bdf8';
 
   spotifyTrack.style.color = titleColor;
-  spotifyArtist.style.color = '#f1f5f9';
-  btnSpotifyPlay.style.color = '#ffffff';
-  btnSpotifyNext.style.color = '#ffffff';
-  btnSpotifyPrev.style.color = '#ffffff';
+  spotifyArtist.style.color = artistColor;
+  spotifyTimeText.style.color = artistColor;
+  btnSpotifyPlay.style.color = titleColor;
+  btnSpotifyNext.style.color = titleColor;
+  btnSpotifyPrev.style.color = titleColor;
   spotifyProgressFill.style.background = accentColor;
 
   // Show track name always
@@ -729,7 +746,6 @@ function updateSpotifyUI(data) {
     spotifyTrack.textContent = data.track;
     spotifyArtist.textContent = data.artist || '';
 
-    // Only reconcile play/pause state on track CHANGE
     const trackKey = data.track + '|' + data.artist;
     if (trackKey !== spotifyLastTrack) {
       spotifyIsPlaying = true;
@@ -740,18 +756,34 @@ function updateSpotifyUI(data) {
     spotifyArtist.textContent = '';
   }
 
-  // Sync timeline anchors
-  currentPosSec = data.position_sec || 0;
-  currentDurSec = data.duration_sec || 0;
-  lastSyncTime = Date.now();
+  // Strict Monotonic Smooth Sync — 100% eliminate jitter & jumping backward
+  const incomingPos = data.position_sec || 0;
+  const incomingDur = data.duration_sec || 0;
+  const now = Date.now();
+  const trackKey = (data.track || '') + '|' + (data.artist || '');
+  const isNewTrack = trackKey !== spotifyLastTrack;
 
-  if (currentDurSec > 0) {
-    const pct = Math.min(100, Math.max(0, (currentPosSec / currentDurSec) * 100));
-    spotifyProgressFill.style.width = `${pct}%`;
-    spotifyTimeText.textContent = `${formatSecs(currentPosSec)} / ${formatSecs(currentDurSec)}`;
+  if (isNewTrack) {
+    currentPosSec = incomingPos;
+    currentDurSec = incomingDur;
+    lastSyncTime = now;
+    spotifyLastTrack = trackKey;
+    spotifyIsPlaying = true;
   } else {
-    spotifyProgressFill.style.width = '0%';
-    spotifyTimeText.textContent = '0:00 / 0:00';
+    currentDurSec = incomingDur;
+    const currentEst = currentPosSec + (spotifyIsPlaying ? (now - lastSyncTime) / 1000 : 0);
+    
+    // If incoming position jumps forward significantly (manual seek > 3s), accept it
+    if (incomingPos > currentEst + 3) {
+      currentPosSec = incomingPos;
+      lastSyncTime = now;
+    } 
+    // If incoming position is slightly behind due to WinRT API lag, keep local smooth progress!
+    else if (incomingPos < currentEst - 3) {
+      // User likely scrubbed backward
+      currentPosSec = incomingPos;
+      lastSyncTime = now;
+    }
   }
 
   setPlayIcon(spotifyIsPlaying);
