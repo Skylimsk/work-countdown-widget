@@ -23,11 +23,14 @@ let quotaCache = {
 
 function getRunnerPath() {
   const candidates = [
-    path.join(process.resourcesPath, 'runner.py'),
-    path.join(__dirname, 'runner.py'),
-    path.join(process.resourcesPath, 'app', 'runner.py'),
-    path.join(process.resourcesPath, 'app.asar.unpacked', 'runner.py')
+    path.join(__dirname, 'runner.py')
   ];
+
+  if (process.resourcesPath) {
+    candidates.unshift(path.join(process.resourcesPath, 'runner.py'));
+    candidates.push(path.join(process.resourcesPath, 'app', 'runner.py'));
+    candidates.push(path.join(process.resourcesPath, 'app.asar.unpacked', 'runner.py'));
+  }
 
   for (const c of candidates) {
     if (fs.existsSync(c)) {
@@ -68,7 +71,7 @@ async function fetchClaudeQuota() {
     const runnerPath = getRunnerPath();
     const runnerDir = path.dirname(runnerPath);
 
-    execFile('python', [runnerPath], { cwd: runnerDir }, (err, stdout, stderr) => {
+    execFile('python', [runnerPath], { cwd: runnerDir }, async (err, stdout, stderr) => {
       if (err || !stdout) {
         writeLog(`Python runner execution error or empty stdout: ${err}`);
         resolve(quotaCache);
