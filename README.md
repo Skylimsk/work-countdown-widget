@@ -11,7 +11,7 @@
 
 Click below to download the official standalone `.exe` installer for Windows (64-bit):
 
-👉 **[⬇️ Download WorkCountdownWidgetSetup.exe](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.3.3/WorkCountdownWidgetSetup.exe)**
+👉 **[⬇️ Download WorkCountdownWidgetSetup.exe](https://github.com/Skylimsk/work-countdown-widget/releases/download/v1.3.4/WorkCountdownWidgetSetup.exe)**
 
 *No unzipping or manual extraction required! Simply double-click `WorkCountdownWidgetSetup.exe` to install and launch.*
 
