@@ -1,6 +1,6 @@
 {
   "name": "work-countdown-widget",
-  "version": "1.0.0",
+  "version": "1.3.4",
   "description": "A sleek, floating desktop widget counting down to your work end time.",
   "main": "main.js",
   "scripts": {
