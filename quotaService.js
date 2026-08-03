@@ -1,6 +1,7 @@
 const { execFile, exec } = require('child_process');
 const path = require('path');
 const fs = require('fs');
+const { fetchAntigravityRealQuota } = require('./agQuotaService');
 
 const logFile = "C:\\Users\\skyli\\widget-debug.log";
 
@@ -109,22 +110,39 @@ async function fetchClaudeQuota() {
           };
 
           // 2. Real-time Google Antigravity Sub-models Activity calculation!
-          if (parsed.antigravity) {
-            quotaCache.antigravityGemini = {
-              session: parsed.antigravity.gemini?.session ?? 98,
-              weekly: parsed.antigravity.gemini?.weekly ?? 81,
-              sessionResetHours: 4,
-              sessionResetMins: 58,
-              weeklyResetDays: 6
-            };
+          try {
+            const agReal = await fetchAntigravityRealQuota();
+            if (agReal) {
+              function formatTimeRemaining(isoStr) {
+                if (!isoStr) return '';
+                const diffMs = new Date(isoStr).getTime() - Date.now();
+                if (diffMs <= 0) return 'ready';
+                const totalMins = Math.floor(diffMs / (1000 * 60));
+                const days = Math.floor(totalMins / (60 * 24));
+                const hours = Math.floor((totalMins % (60 * 24)) / 60);
+                const mins = totalMins % 60;
 
-            quotaCache.antigravityClaudeGpt = {
-              session: parsed.antigravity.claude_gpt?.session ?? 100,
-              weekly: parsed.antigravity.claude_gpt?.weekly ?? 100,
-              sessionResetHours: 5,
-              sessionResetMins: 0,
-              weeklyResetDays: 7
-            };
+                if (days > 0) return `${days}d ${hours}h`;
+                if (hours > 0) return `${hours}h ${mins}m`;
+                return `${mins}m`;
+              }
+
+              quotaCache.antigravityGemini = {
+                session: agReal.gemini.session,
+                weekly: agReal.gemini.weekly,
+                sessionResetText: formatTimeRemaining(agReal.gemini.sessionReset),
+                weeklyResetText: formatTimeRemaining(agReal.gemini.weeklyReset)
+              };
+
+              quotaCache.antigravityClaudeGpt = {
+                session: agReal.claudeGpt.session,
+                weekly: agReal.claudeGpt.weekly,
+                sessionResetText: formatTimeRemaining(agReal.claudeGpt.sessionReset),
+                weeklyResetText: formatTimeRemaining(agReal.claudeGpt.weeklyReset)
+              };
+            }
+          } catch (agErr) {
+            writeLog(`Antigravity real-time quota fetch warning: ${agErr}`);
           }
 
           quotaCache.error = null;

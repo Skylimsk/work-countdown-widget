@@ -210,31 +210,31 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     claudeWeeklyVal.textContent = isOffline ? 'N/A' : `${cWeeklyRemaining}%`;
     claudeWeeklyReset.textContent = isOffline ? 'offline' : formatTimeRemaining(claudeData.weeklyReset);
 
-    // 2. Render Google Antigravity - Gemini Models (DIRECT OFFICIAL REMAINING VALUE 14% / 67%)
-    const agGeminiData = data.antigravityGemini || { session: 14, weekly: 67 };
+    // 2. Render Google Antigravity - Gemini Models
+    const agGeminiData = data.antigravityGemini || { session: 100, weekly: 100 };
     const aggSession = Number(agGeminiData.session);
     const aggWeekly = Number(agGeminiData.weekly);
 
     agGeminiSessionBar.style.width = `${aggSession}%`;
     agGeminiSessionVal.textContent = `${aggSession}%`;
-    if (agGeminiSessionReset) agGeminiSessionReset.textContent = 'refresh in 3h 46m';
+    if (agGeminiSessionReset) agGeminiSessionReset.textContent = agGeminiData.sessionResetText ? `refresh in ${agGeminiData.sessionResetText}` : 'refresh in --';
 
     agGeminiWeeklyBar.style.width = `${aggWeekly}%`;
     agGeminiWeeklyVal.textContent = `${aggWeekly}%`;
-    if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = 'refresh in 5d 23h';
+    if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = agGeminiData.weeklyResetText ? `refresh in ${agGeminiData.weeklyResetText}` : 'refresh in --';
 
-    // 2. Render Google Antigravity - Claude & GPT Models
+    // 3. Render Google Antigravity - Claude & GPT Models
     const agClaudeData = data.antigravityClaudeGpt || { session: 100, weekly: 100 };
     const agcSession = Number(agClaudeData.session);
     const agcWeekly = Number(agClaudeData.weekly);
 
     agClaudeSessionBar.style.width = `${agcSession}%`;
     agClaudeSessionVal.textContent = `${agcSession}%`;
-    if (agClaudeSessionReset) agClaudeSessionReset.textContent = 'refresh in 5h';
+    if (agClaudeSessionReset) agClaudeSessionReset.textContent = agClaudeData.sessionResetText ? `refresh in ${agClaudeData.sessionResetText}` : 'refresh in --';
 
     agClaudeWeeklyBar.style.width = `${agcWeekly}%`;
     agClaudeWeeklyVal.textContent = `${agcWeekly}%`;
-    if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = 'refresh in 7d';
+    if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = agClaudeData.weeklyResetText ? `refresh in ${agClaudeData.weeklyResetText}` : 'refresh in --';
 
     applyQuotaLayout();
   }
