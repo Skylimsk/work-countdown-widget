@@ -94,7 +94,7 @@ html, body {
 .drag-handle {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 4px;
   padding: 8px 8px 7px 10px;
   border-bottom: 1px solid var(--border);
   background: rgba(255,255,255,0.015);
@@ -103,6 +103,7 @@ html, body {
   user-select: none;
   position: relative;
   z-index: 5;
+  overflow: hidden;
 }
 
 .status-indicator {
@@ -127,8 +128,9 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
+  gap: 3px;
   min-width: 0;
+  overflow: hidden;
 }
 .phase-emoji {
   font-size: 13px;
@@ -138,19 +140,21 @@ html, body {
 }
 .phase-time {
   font-family: 'JetBrains Mono','Consolas',monospace;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 700;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
   color: var(--text-1);
   line-height: 1;
   text-shadow: 0 0 22px var(--day-glow);
   transition: text-shadow var(--ease-slow);
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .window-controls {
   display: flex;
   align-items: center;
-  gap: 1px;
+  gap: 0px;
   flex-shrink: 0;
   -webkit-app-region: no-drag;
 }
@@ -158,7 +162,8 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px; height: 22px;
+  width: 20px; height: 20px;
+  flex-shrink: 0;
   border: none;
   background: transparent;
   color: var(--text-3);
@@ -180,10 +185,11 @@ html, body {
 }
 .progress-bar-bg {
   width: 100%;
-  height: 8px;
-  background: rgba(255,255,255,0.08);
+  height: 9px;
+  background: rgba(255,255,255,0.07);
   border-radius: var(--r-pill);
   overflow: hidden;
+  position: relative;
 }
 .progress-bar-fill {
   height: 100%;
@@ -210,18 +216,18 @@ html, body {
 .ot-label { font-size: 8.5px; font-weight: 600; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.4px; }
 .ot-money-val { font-family: 'JetBrains Mono',monospace; font-size: 10px; font-weight: 700; color: var(--day-primary); transition: color var(--ease-slow); }
 
-/* ─── Spotify Floating Curved Card ────────────────────────────── */
+/* ─── Spotify Floating Curved Card (Theme-Adaptive) ──────────── */
 .spotify-bar {
   margin: 6px 8px;
   padding: 8px 10px;
-  background: rgba(255,255,255,0.04);
+  background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
   display: flex;
   flex-direction: column;
   gap: 5px;
-  transition: background var(--ease), border-color var(--ease), box-shadow var(--ease);
+  transition: background var(--ease-slow), border-color var(--ease-slow), box-shadow var(--ease-slow);
 }
 .spotify-main-row { display: flex; align-items: center; gap: 6px; }
 .spotify-track-info { display: flex; align-items: center; gap: 5px; flex: 1; overflow: hidden; }
@@ -232,14 +238,16 @@ html, body {
 .spotify-text { display: flex; flex-direction: column; overflow: hidden; flex: 1; gap: 1px; }
 
 .spotify-track {
-  font-size: 10.5px; font-weight: 700; color: #ffffff;
+  font-size: 10.5px; font-weight: 700; color: var(--text-1);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 128px;
+  transition: color var(--ease-slow);
 }
 .spotify-track.marquee-active { text-overflow: clip; animation: spt-scroll 7s linear infinite; animation-delay: 0.8s; }
 
 .spotify-artist {
-  font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.7);
+  font-size: 9px; font-weight: 500; color: var(--text-2);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 128px;
+  transition: color var(--ease-slow);
 }
 .spotify-artist.marquee-active { text-overflow: clip; animation: spt-scroll 7s linear infinite; animation-delay: 1.2s; }
 
@@ -253,19 +261,19 @@ html, body {
 
 .spotify-controls { display: flex; gap: 1px; align-items: center; flex-shrink: 0; }
 .spotify-btn {
-  background: transparent; border: none; color: rgba(255,255,255,0.85);
+  background: transparent; border: none; color: var(--text-2);
   cursor: pointer; font-size: 13px; font-family: 'Segoe UI Emoji','Apple Color Emoji',sans-serif;
   padding: 2px 3px; border-radius: var(--r-sm);
   transition: color var(--ease), transform var(--ease), background var(--ease);
   -webkit-app-region: no-drag;
 }
-.spotify-btn:hover { color: #fff; transform: scale(1.18); background: rgba(255,255,255,0.12); }
+.spotify-btn:hover { color: var(--text-1); transform: scale(1.18); background: rgba(255,255,255,0.08); }
 .spotify-btn:active { transform: scale(0.88); }
 
 .spotify-progress-row { display: flex; align-items: center; gap: 7px; width: 100%; margin-top: 2px; }
-.spotify-progress-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.2); border-radius: var(--r-pill); overflow: hidden; }
-.spotify-progress-fill { height: 100%; border-radius: var(--r-pill); background: var(--day-primary); }
-.spotify-time { font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; color: rgba(255,255,255,0.75); white-space: nowrap; flex-shrink: 0; }
+.spotify-progress-bg { flex: 1; height: 4px; background: rgba(255,255,255,0.12); border-radius: var(--r-pill); overflow: hidden; }
+.spotify-progress-fill { height: 100%; border-radius: var(--r-pill); background: var(--day-primary); transition: background var(--ease-slow); }
+.spotify-time { font-family: 'JetBrains Mono',monospace; font-size: 8.5px; font-weight: 600; color: var(--text-2); white-space: nowrap; flex-shrink: 0; transition: color var(--ease-slow); }
 
 /* ─── AI Quota Section ──────────────────────────────────────── */
 .quota-section { border-bottom: 1px solid var(--border); max-height: 260px; overflow-y: auto; }

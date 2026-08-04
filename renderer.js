@@ -737,24 +737,6 @@ function updateSpotifyUI(data) {
   }
   spotifyBar.style.display = 'flex';
 
-  // Apply Solid Dynamic Theme Color matching Album Art
-  if (data.bgColor) {
-    spotifyBar.style.backgroundColor = data.bgColor;
-    spotifyBar.style.borderColor = data.accentColor || 'rgba(255,255,255,0.3)';
-  }
-  
-  const titleColor = data.fgTitle || '#ffffff';
-  const artistColor = data.fgArtist || 'rgba(255,255,255,0.8)';
-  const accentColor = data.accentColor || '#38bdf8';
-
-  spotifyTrack.style.color = titleColor;
-  spotifyArtist.style.color = artistColor;
-  spotifyTimeText.style.color = artistColor;
-  btnSpotifyPlay.style.color = titleColor;
-  btnSpotifyNext.style.color = titleColor;
-  btnSpotifyPrev.style.color = titleColor;
-  spotifyProgressFill.style.background = accentColor;
-
   // Show track name always
   if (data.track) {
     spotifyTrack.textContent = data.track;

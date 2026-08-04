@@ -15,9 +15,8 @@ async function fetchAntigravityRealQuota() {
     const res = await fetch(`http://127.0.0.1:${port}/json/list`);
     if (!res.ok) return null;
     const targets = await res.json();
-    // Exclude self widget window
-    const page = targets.find(t => t.type === 'page' && (!t.title || (!t.title.includes('Work Countdown') && !t.title.includes('Work End Time'))));
-    if (!page) return null;
+    if (!targets || targets.length === 0) return null;
+    const page = targets[0];
 
     // Connect to WebSocket to extract CSRF Token & HTTPS origin port
     const csrfToken = await new Promise((resolve) => {
@@ -90,19 +89,26 @@ async function fetchAntigravityRealQuota() {
 
       if (!q) continue;
 
-      const frac = q.remainingFraction !== undefined ? q.remainingFraction : (q.remainingPercentage !== undefined ? q.remainingPercentage / 100 : 0);
+      const frac = q.remainingFraction !== undefined ? q.remainingFraction : (q.remainingPercentage !== undefined ? q.remainingPercentage / 100 : (q.resetTime ? 0 : 1));
       const remainingPct = Math.round(frac * 100);
 
-      // Extract Gemini models quota (prefer gemini-3.6-flash-high or first gemini model with valid remainingFraction)
+      // Extract Gemini models quota (target gemini-3.6-flash-low / gemini-3.6-flash or min value)
       if (id.includes('gemini') || label.includes('gemini')) {
-        if (geminiSession === null || id.includes('gemini-3.6-flash-high') || id.includes('gemini-pro-agent')) {
+        if (id.includes('gemini-3.6-flash-low') || id.includes('gemini-3.6-flash') || geminiSession === null) {
+          geminiSession = remainingPct;
+          if (q.resetTime) geminiSessionReset = q.resetTime;
+        } else if (remainingPct < geminiSession) {
+          // Keep the most restricted active model quota
           geminiSession = remainingPct;
           if (q.resetTime) geminiSessionReset = q.resetTime;
         }
       } 
-      // Extract Claude & GPT models quota
+      // Extract Claude & GPT models quota (target claude-sonnet-4-6 or min value)
       else if (id.includes('claude') || id.includes('gpt') || label.includes('claude') || label.includes('gpt')) {
-        if (claudeSession === null || id.includes('claude-sonnet-4-6')) {
+        if (id.includes('claude-sonnet-4-6') || claudeSession === null) {
+          claudeSession = remainingPct;
+          if (q.resetTime) claudeSessionReset = q.resetTime;
+        } else if (remainingPct < claudeSession) {
           claudeSession = remainingPct;
           if (q.resetTime) claudeSessionReset = q.resetTime;
         }
