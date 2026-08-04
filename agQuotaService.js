@@ -15,7 +15,8 @@ async function fetchAntigravityRealQuota() {
     const res = await fetch(`http://127.0.0.1:${port}/json/list`);
     if (!res.ok) return null;
     const targets = await res.json();
-    const page = targets.find(t => t.type === 'page');
+    // Exclude self widget window
+    const page = targets.find(t => t.type === 'page' && (!t.title || (!t.title.includes('Work Countdown') && !t.title.includes('Work End Time'))));
     if (!page) return null;
 
     // Connect to WebSocket to extract CSRF Token & HTTPS origin port
