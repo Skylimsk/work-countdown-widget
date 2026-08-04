@@ -761,56 +761,56 @@ function updateSpotifyUI(data) {
   }
   spotifyBar.style.display = 'flex';
 
+  // Synchronize real play/pause state from Windows Media Session
+  spotifyIsPlaying = !data.paused;
+
   // Show track name always
   if (data.track) {
     spotifyTrack.textContent = data.track;
     spotifyArtist.textContent = data.artist || '';
-
-    const trackKey = data.track + '|' + data.artist;
-    if (trackKey !== spotifyLastTrack) {
-      spotifyIsPlaying = true;
-      spotifyLastTrack = trackKey;
-    }
+    spotifyLastTrack = data.track + '|' + (data.artist || '');
   } else {
     spotifyTrack.textContent = 'Spotify';
     spotifyArtist.textContent = '';
   }
 
-  // Strict Monotonic Smooth Sync — 100% eliminate jitter & jumping backward
-  const incomingPos = data.position_sec || 0;
-  const incomingDur = data.duration_sec || 0;
+  // Smooth position reconciliation
+  const incomingPos = Math.max(0, data.position_sec || 0);
+  const incomingDur = Math.max(0, data.duration_sec || 0);
   const now = Date.now();
-  const trackKey = (data.track || '') + '|' + (data.artist || '');
-  const isNewTrack = trackKey !== spotifyLastTrack;
 
-  if (isNewTrack) {
+  currentDurSec = incomingDur;
+
+  if (!spotifyIsPlaying) {
+    // PAUSED: Freeze position completely, stop smooth animation loop!
     currentPosSec = incomingPos;
-    currentDurSec = incomingDur;
     lastSyncTime = now;
-    spotifyLastTrack = trackKey;
-    spotifyIsPlaying = true;
+    if (animFrameId) {
+      cancelAnimationFrame(animFrameId);
+      animFrameId = null;
+    }
+    // Render static paused state cleanly once
+    if (currentDurSec > 0) {
+      const pct = Math.min(100, Math.max(0, (currentPosSec / currentDurSec) * 100));
+      spotifyProgressFill.style.width = `${pct}%`;
+      spotifyTimeText.textContent = `${formatSecs(currentPosSec)} / ${formatSecs(currentDurSec)}`;
+    } else {
+      spotifyProgressFill.style.width = '0%';
+      spotifyTimeText.textContent = '0:00 / 0:00';
+    }
   } else {
-    currentDurSec = incomingDur;
-    const currentEst = currentPosSec + (spotifyIsPlaying ? (now - lastSyncTime) / 1000 : 0);
-    
-    // If incoming position jumps forward significantly (manual seek > 3s), accept it
-    if (incomingPos > currentEst + 3) {
+    // PLAYING: Reconcile position if difference > 2.5s
+    const currentEst = currentPosSec + (now - lastSyncTime) / 1000;
+    if (Math.abs(incomingPos - currentEst) > 2.5) {
       currentPosSec = incomingPos;
       lastSyncTime = now;
-    } 
-    // If incoming position is slightly behind due to WinRT API lag, keep local smooth progress!
-    else if (incomingPos < currentEst - 3) {
-      // User likely scrubbed backward
-      currentPosSec = incomingPos;
-      lastSyncTime = now;
+    }
+    if (!animFrameId) {
+      animFrameId = requestAnimationFrame(tickSmoothProgress);
     }
   }
 
   setPlayIcon(spotifyIsPlaying);
-
-  if (!animFrameId) {
-    animFrameId = requestAnimationFrame(tickSmoothProgress);
-  }
 }
 
 ipcRenderer.on('spotify-update', (event, data) => {
