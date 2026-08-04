@@ -149,14 +149,18 @@ async function fetchClaudeQuota() {
                   session: agReal.gemini.session,
                   weekly: agReal.gemini.weekly,
                   sessionResetText: formatTimeRemaining(agReal.gemini.sessionReset),
-                  weeklyResetText: formatTimeRemaining(agReal.gemini.weeklyReset)
+                  weeklyResetText: formatTimeRemaining(agReal.gemini.weeklyReset),
+                  sessionResetIso: agReal.gemini.sessionReset,
+                  weeklyResetIso: agReal.gemini.weeklyReset
                 };
 
                 quotaCache.antigravityClaudeGpt = {
                   session: agReal.claudeGpt.session,
                   weekly: agReal.claudeGpt.weekly,
                   sessionResetText: formatTimeRemaining(agReal.claudeGpt.sessionReset),
-                  weeklyResetText: formatTimeRemaining(agReal.claudeGpt.weeklyReset)
+                  weeklyResetText: formatTimeRemaining(agReal.claudeGpt.weeklyReset),
+                  sessionResetIso: agReal.claudeGpt.sessionReset,
+                  weeklyResetIso: agReal.claudeGpt.weeklyReset
                 };
               }
             }

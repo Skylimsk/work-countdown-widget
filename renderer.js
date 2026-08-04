@@ -216,24 +216,39 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     const cSessionRemaining = Math.max(0, 100 - cSessionUsed);
     const cWeeklyRemaining = Math.max(0, 100 - cWeeklyUsed);
 
-    claudeSessionBar.style.width = isOffline ? '0%' : `${cSessionRemaining}%`;
-    claudeSessionVal.textContent = isOffline ? 'N/A' : `${cSessionRemaining}%`;
-    claudeSessionReset.textContent = isOffline ? 'offline' : formatTimeRemaining(claudeData.sessionReset);
+    function getRecoveryPct(isoStr, isWeekly) {
+      if (!isoStr) return 0;
+      const diffMs = new Date(isoStr).getTime() - Date.now();
+      if (diffMs <= 0) return 100;
+      const totalPeriodMs = isWeekly ? (7 * 24 * 3600 * 1000) : (5 * 3600 * 1000);
+      const totalMs = Math.max(totalPeriodMs, diffMs);
+      const recoveredMs = totalMs - diffMs;
+      return Math.min(100, Math.max(2, Math.round((recoveredMs / totalMs) * 100)));
+    }
 
-    claudeWeeklyBar.style.width = isOffline ? '0%' : `${cWeeklyRemaining}%`;
+    const cSessionBarWidth = (cSessionRemaining === 0 && claudeData.sessionReset) ? getRecoveryPct(claudeData.sessionReset, false) : cSessionRemaining;
+    const cWeeklyBarWidth = (cWeeklyRemaining === 0 && claudeData.weeklyReset) ? getRecoveryPct(claudeData.weeklyReset, true) : cWeeklyRemaining;
+
+    claudeSessionBar.style.width = isOffline ? '0%' : `${cSessionBarWidth}%`;
+    claudeSessionVal.textContent = isOffline ? 'N/A' : `${cSessionRemaining}%`;
+    claudeSessionReset.textContent = isOffline ? 'offline' : (claudeData.sessionReset ? `refresh in ${formatTimeRemaining(claudeData.sessionReset)}` : 'refresh in --');
+
+    claudeWeeklyBar.style.width = isOffline ? '0%' : `${cWeeklyBarWidth}%`;
     claudeWeeklyVal.textContent = isOffline ? 'N/A' : `${cWeeklyRemaining}%`;
-    claudeWeeklyReset.textContent = isOffline ? 'offline' : formatTimeRemaining(claudeData.weeklyReset);
+    claudeWeeklyReset.textContent = isOffline ? 'offline' : (claudeData.weeklyReset ? `refresh in ${formatTimeRemaining(claudeData.weeklyReset)}` : 'refresh in --');
 
     // 2. Render Google Antigravity - Gemini Models
     const agGeminiData = data.antigravityGemini || { session: 100, weekly: 100 };
     const aggSession = Number(agGeminiData.session);
     const aggWeekly = Number(agGeminiData.weekly);
+    const aggSessionBarWidth = (aggSession === 0 && agGeminiData.sessionResetIso) ? getRecoveryPct(agGeminiData.sessionResetIso, false) : aggSession;
+    const aggWeeklyBarWidth = (aggWeekly === 0 && agGeminiData.weeklyResetIso) ? getRecoveryPct(agGeminiData.weeklyResetIso, true) : aggWeekly;
 
-    agGeminiSessionBar.style.width = `${aggSession}%`;
+    agGeminiSessionBar.style.width = `${aggSessionBarWidth}%`;
     agGeminiSessionVal.textContent = `${aggSession}%`;
     if (agGeminiSessionReset) agGeminiSessionReset.textContent = agGeminiData.sessionResetText ? `refresh in ${agGeminiData.sessionResetText}` : 'refresh in --';
 
-    agGeminiWeeklyBar.style.width = `${aggWeekly}%`;
+    agGeminiWeeklyBar.style.width = `${aggWeeklyBarWidth}%`;
     agGeminiWeeklyVal.textContent = `${aggWeekly}%`;
     if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = agGeminiData.weeklyResetText ? `refresh in ${agGeminiData.weeklyResetText}` : 'refresh in --';
 
@@ -241,12 +256,14 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     const agClaudeData = data.antigravityClaudeGpt || { session: 100, weekly: 100 };
     const agcSession = Number(agClaudeData.session);
     const agcWeekly = Number(agClaudeData.weekly);
+    const agcSessionBarWidth = (agcSession === 0 && agClaudeData.sessionResetIso) ? getRecoveryPct(agClaudeData.sessionResetIso, false) : agcSession;
+    const agcWeeklyBarWidth = (agcWeekly === 0 && agClaudeData.weeklyResetIso) ? getRecoveryPct(agClaudeData.weeklyResetIso, true) : agcWeekly;
 
-    agClaudeSessionBar.style.width = `${agcSession}%`;
+    agClaudeSessionBar.style.width = `${agcSessionBarWidth}%`;
     agClaudeSessionVal.textContent = `${agcSession}%`;
     if (agClaudeSessionReset) agClaudeSessionReset.textContent = agClaudeData.sessionResetText ? `refresh in ${agClaudeData.sessionResetText}` : 'refresh in --';
 
-    agClaudeWeeklyBar.style.width = `${agcWeekly}%`;
+    agClaudeWeeklyBar.style.width = `${agcWeeklyBarWidth}%`;
     agClaudeWeeklyVal.textContent = `${agcWeekly}%`;
     if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = agClaudeData.weeklyResetText ? `refresh in ${agClaudeData.weeklyResetText}` : 'refresh in --';
 
