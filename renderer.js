@@ -13,6 +13,20 @@ const { ipcRenderer } = require('electron');
   } catch (e) {}
 })();
 
+// ─── Day-of-Week Dynamic Theme System ────────────────────────
+function applyDayTheme() {
+  const day = new Date().getDay(); // 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+  document.body.setAttribute('data-day', day);
+}
+applyDayTheme();
+
+// Automatically update theme at midnight
+(function scheduleMidnightTheme() {
+  const now = new Date();
+  const msToMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1) - now;
+  setTimeout(() => { applyDayTheme(); scheduleMidnightTheme(); }, msToMidnight);
+})();
+
 // Load stored user presets
 let config = ipcRenderer.sendSync('get-config');
 
