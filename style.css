@@ -28,17 +28,17 @@
 }
 
 /* Monday – Steel Blue */
-body[data-day="1"] { --day-primary:#4f8ef7; --day-secondary:#1a56db; --day-glow:rgba(79,142,247,0.3);   --day-bg-tint:rgba(79,142,247,0.06); }
+body[data-day="1"] { --day-primary:#4f8ef7; --day-secondary:#1a56db; --day-glow:rgba(79,142,247,0.3);   --day-bg-tint:rgba(79,142,247,0.06); --day-gradient: linear-gradient(135deg, #4f8ef7, #1a56db); }
 /* Tuesday – Emerald */
-body[data-day="2"] { --day-primary:#34d399; --day-secondary:#059669; --day-glow:rgba(52,211,153,0.3);  --day-bg-tint:rgba(52,211,153,0.06); }
+body[data-day="2"] { --day-primary:#34d399; --day-secondary:#059669; --day-glow:rgba(52,211,153,0.3);  --day-bg-tint:rgba(52,211,153,0.06); --day-gradient: linear-gradient(135deg, #34d399, #059669); }
 /* Wednesday – Violet */
-body[data-day="3"] { --day-primary:#a78bfa; --day-secondary:#7c3aed; --day-glow:rgba(167,139,250,0.3); --day-bg-tint:rgba(139,92,246,0.06); }
+body[data-day="3"] { --day-primary:#a78bfa; --day-secondary:#7c3aed; --day-glow:rgba(167,139,250,0.3); --day-bg-tint:rgba(139,92,246,0.06); --day-gradient: linear-gradient(135deg, #a78bfa, #7c3aed); }
 /* Thursday – Amber */
-body[data-day="4"] { --day-primary:#fbbf24; --day-secondary:#d97706; --day-glow:rgba(251,191,36,0.3);  --day-bg-tint:rgba(245,158,11,0.06); }
+body[data-day="4"] { --day-primary:#fbbf24; --day-secondary:#d97706; --day-glow:rgba(251,191,36,0.3);  --day-bg-tint:rgba(245,158,11,0.06); --day-gradient: linear-gradient(135deg, #fbbf24, #d97706); }
 /* Friday – Rose */
-body[data-day="5"] { --day-primary:#fb7185; --day-secondary:#e11d48; --day-glow:rgba(251,113,133,0.3); --day-bg-tint:rgba(244,63,94,0.06); }
+body[data-day="5"] { --day-primary:#fb7185; --day-secondary:#e11d48; --day-glow:rgba(251,113,133,0.3); --day-bg-tint:rgba(244,63,94,0.06); --day-gradient: linear-gradient(135deg, #fb7185, #e11d48); }
 /* Weekend – Slate */
-body[data-day="0"], body[data-day="6"] { --day-primary:#94a3b8; --day-secondary:#64748b; --day-glow:rgba(148,163,184,0.2); --day-bg-tint:rgba(100,116,139,0.04); }
+body[data-day="0"], body[data-day="6"] { --day-primary:#94a3b8; --day-secondary:#64748b; --day-glow:rgba(148,163,184,0.2); --day-bg-tint:rgba(100,116,139,0.04); --day-gradient: linear-gradient(135deg, #94a3b8, #64748b); }
 
 /* ─── Reset ─────────────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
