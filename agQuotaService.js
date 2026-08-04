@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const WebSocket = require('ws');
 
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
@@ -7,47 +8,59 @@ async function fetchAntigravityRealQuota() {
   try {
     const portFile = path.join(process.env.APPDATA, 'Antigravity', 'DevToolsActivePort');
     if (!fs.existsSync(portFile)) {
-      return null;
+      return { error: 'ERR: DevToolsPort file missing' };
     }
     const lines = fs.readFileSync(portFile, 'utf8').split('\n');
     const port = lines[0].trim();
 
-    const res = await fetch(`http://127.0.0.1:${port}/json/list`);
-    if (!res.ok) return null;
+    let res;
+    try {
+      res = await fetch(`http://127.0.0.1:${port}/json/list`);
+    } catch(e) {
+      return { error: `ERR: DevTools HTTP connect failed (${e.message})` };
+    }
+    if (!res.ok) return { error: `ERR: DevTools HTTP ${res.status}` };
+
     const targets = await res.json();
-    if (!targets || targets.length === 0) return null;
+    if (!targets || targets.length === 0) return { error: 'ERR: No DevTools target found' };
     const page = targets[0];
 
     // Connect to WebSocket to extract CSRF Token & HTTPS origin port
     const csrfToken = await new Promise((resolve) => {
-      const ws = new WebSocket(page.webSocketDebuggerUrl);
-      const timer = setTimeout(() => { try { ws.close(); } catch(e){} resolve(null); }, 3000);
+      let ws;
+      try {
+        ws = new WebSocket(page.webSocketDebuggerUrl);
+      } catch(e) {
+        return resolve({ error: `ERR: WS init failed (${e.message})` });
+      }
 
-      ws.onopen = () => {
+      const timer = setTimeout(() => { try { ws.close(); } catch(e){} resolve({ error: 'ERR: WS timeout 3s' }); }, 3000);
+
+      ws.on('open', () => {
         const expr = `({ csrf: window.__APP_CONFIG__ && window.__APP_CONFIG__.csrfToken, href: window.location.href })`;
         ws.send(JSON.stringify({ id: 1, method: 'Runtime.evaluate', params: { expression: expr, returnByValue: true } }));
-      };
+      });
 
-      ws.onmessage = (evt) => {
+      ws.on('message', (evt) => {
         clearTimeout(timer);
         try {
-          const msg = JSON.parse(evt.data);
+          const msg = JSON.parse(evt.toString());
           const val = msg.result && msg.result.result && msg.result.result.value;
-          resolve(val);
+          resolve(val || { error: 'ERR: CSRF Token undefined in AG' });
         } catch (e) {
-          resolve(null);
+          resolve({ error: `ERR: WS parse error (${e.message})` });
         }
         try { ws.close(); } catch(e){}
-      };
+      });
 
-      ws.onerror = () => {
+      ws.on('error', (err) => {
         clearTimeout(timer);
-        resolve(null);
-      };
+        resolve({ error: `ERR: WS error (${err.message})` });
+      });
     });
 
-    if (!csrfToken || !csrfToken.csrf) {
-      return null;
+    if (!csrfToken || csrfToken.error || !csrfToken.csrf) {
+      return { error: csrfToken && csrfToken.error ? csrfToken.error : 'ERR: No CSRF Token' };
     }
 
     // Determine target API port from href (e.g. https://127.0.0.1:64518/...)
@@ -58,19 +71,26 @@ async function fetchAntigravityRealQuota() {
     } catch(e) {}
 
     // Call GetUserStatus API directly with the captured CSRF token
-    const apiRes = await fetch(`https://127.0.0.1:${apiPort}/exa.language_server_pb.LanguageServerService/GetUserStatus`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'connect-protocol-version': '1',
-        'x-codeium-csrf-token': csrfToken.csrf
-      },
-      body: JSON.stringify({})
-    });
+    let apiRes;
+    try {
+      apiRes = await fetch(`https://127.0.0.1:${apiPort}/exa.language_server_pb.LanguageServerService/GetUserStatus`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'connect-protocol-version': '1',
+          'x-codeium-csrf-token': csrfToken.csrf
+        },
+        body: JSON.stringify({})
+      });
+    } catch(e) {
+      return { error: `ERR: API fetch failed (${e.message})` };
+    }
 
-    if (!apiRes.ok) return null;
+    if (!apiRes.ok) return { error: `ERR: API ${apiRes.status}` };
     const statusData = await apiRes.json();
     const models = (statusData.userStatus && statusData.userStatus.cascadeModelConfigData && statusData.userStatus.cascadeModelConfigData.clientModelConfigs) || [];
+
+    if (models.length === 0) return { error: 'ERR: No AG models returned' };
 
     let geminiSession = null;
     let geminiWeekly = null;
@@ -92,18 +112,17 @@ async function fetchAntigravityRealQuota() {
       const frac = q.remainingFraction !== undefined ? q.remainingFraction : (q.remainingPercentage !== undefined ? q.remainingPercentage / 100 : (q.resetTime ? 0 : 1));
       const remainingPct = Math.round(frac * 100);
 
-      // Extract Gemini models quota (target gemini-3.6-flash-low / gemini-3.6-flash or min value)
+      // Extract Gemini models quota
       if (id.includes('gemini') || label.includes('gemini')) {
         if (id.includes('gemini-3.6-flash-low') || id.includes('gemini-3.6-flash') || geminiSession === null) {
           geminiSession = remainingPct;
           if (q.resetTime) geminiSessionReset = q.resetTime;
         } else if (remainingPct < geminiSession) {
-          // Keep the most restricted active model quota
           geminiSession = remainingPct;
           if (q.resetTime) geminiSessionReset = q.resetTime;
         }
       } 
-      // Extract Claude & GPT models quota (target claude-sonnet-4-6 or min value)
+      // Extract Claude & GPT models quota
       else if (id.includes('claude') || id.includes('gpt') || label.includes('claude') || label.includes('gpt')) {
         if (id.includes('claude-sonnet-4-6') || claudeSession === null) {
           claudeSession = remainingPct;
@@ -130,7 +149,7 @@ async function fetchAntigravityRealQuota() {
       }
     };
   } catch (e) {
-    return null;
+    return { error: `ERR: ${e.message}` };
   }
 }
 
@@ -151,7 +170,6 @@ async function fetchCursorRealQuota(token) {
     if (!res.ok) return null;
     const data = await res.json();
     
-    // Parse Cursor API response: gpt4 / fast requests
     const gpt4 = data['gpt-4'] || {};
     const maxReqs = gpt4.maxRequestUsage || 500;
     const numReqs = gpt4.numRequests || 0;

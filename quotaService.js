@@ -116,36 +116,53 @@ async function fetchClaudeQuota() {
           try {
             const agReal = await fetchAntigravityRealQuota();
             if (agReal) {
-              function formatTimeRemaining(isoStr) {
-                if (!isoStr) return '';
-                const diffMs = new Date(isoStr).getTime() - Date.now();
-                if (diffMs <= 0) return 'ready';
-                const totalMins = Math.floor(diffMs / (1000 * 60));
-                const days = Math.floor(totalMins / (60 * 24));
-                const hours = Math.floor((totalMins % (60 * 24)) / 60);
-                const mins = totalMins % 60;
+              if (agReal.error) {
+                // Directly display the real error message to UI! No fallback!
+                quotaCache.antigravityGemini = {
+                  session: 0,
+                  weekly: 0,
+                  sessionResetText: agReal.error,
+                  weeklyResetText: ''
+                };
+                quotaCache.antigravityClaudeGpt = {
+                  session: 0,
+                  weekly: 0,
+                  sessionResetText: agReal.error,
+                  weeklyResetText: ''
+                };
+              } else {
+                function formatTimeRemaining(isoStr) {
+                  if (!isoStr) return '';
+                  const diffMs = new Date(isoStr).getTime() - Date.now();
+                  if (diffMs <= 0) return 'ready';
+                  const totalMins = Math.floor(diffMs / (1000 * 60));
+                  const days = Math.floor(totalMins / (60 * 24));
+                  const hours = Math.floor((totalMins % (60 * 24)) / 60);
+                  const mins = totalMins % 60;
 
-                if (days > 0) return `${days}d ${hours}h`;
-                if (hours > 0) return `${hours}h ${mins}m`;
-                return `${mins}m`;
+                  if (days > 0) return `${days}d ${hours}h`;
+                  if (hours > 0) return `${hours}h ${mins}m`;
+                  return `${mins}m`;
+                }
+
+                quotaCache.antigravityGemini = {
+                  session: agReal.gemini.session,
+                  weekly: agReal.gemini.weekly,
+                  sessionResetText: formatTimeRemaining(agReal.gemini.sessionReset),
+                  weeklyResetText: formatTimeRemaining(agReal.gemini.weeklyReset)
+                };
+
+                quotaCache.antigravityClaudeGpt = {
+                  session: agReal.claudeGpt.session,
+                  weekly: agReal.claudeGpt.weekly,
+                  sessionResetText: formatTimeRemaining(agReal.claudeGpt.sessionReset),
+                  weeklyResetText: formatTimeRemaining(agReal.claudeGpt.weeklyReset)
+                };
               }
-
-              quotaCache.antigravityGemini = {
-                session: agReal.gemini.session,
-                weekly: agReal.gemini.weekly,
-                sessionResetText: formatTimeRemaining(agReal.gemini.sessionReset),
-                weeklyResetText: formatTimeRemaining(agReal.gemini.weeklyReset)
-              };
-
-              quotaCache.antigravityClaudeGpt = {
-                session: agReal.claudeGpt.session,
-                weekly: agReal.claudeGpt.weekly,
-                sessionResetText: formatTimeRemaining(agReal.claudeGpt.sessionReset),
-                weeklyResetText: formatTimeRemaining(agReal.claudeGpt.weeklyReset)
-              };
             }
           } catch (agErr) {
             writeLog(`Antigravity real-time quota fetch warning: ${agErr}`);
+            quotaCache.antigravityGemini.sessionResetText = `ERR: ${agErr.message}`;
           }
 
           // 3. Real-time Cursor Quota calculation

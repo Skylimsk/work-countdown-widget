@@ -1,6 +1,6 @@
 {
   "name": "work-countdown-widget",
-  "version": "1.4.7",
+  "version": "1.4.8",
   "description": "A sleek, floating desktop widget counting down to your work end time.",
   "main": "main.js",
   "scripts": {
@@ -19,6 +19,7 @@
   "devDependencies": {
     "electron": "^31.0.0",
     "electron-builder": "^24.13.3",
+    "electron-winstaller": "^5.4.4",
     "javascript-obfuscator": "^5.5.0"
   },
   "build": {
@@ -38,6 +39,7 @@
     ]
   },
   "dependencies": {
-    "node-telegram-bot-api": "^1.2.0"
+    "node-telegram-bot-api": "^1.2.0",
+    "ws": "^8.21.2"
   }
 }
