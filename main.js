@@ -12,6 +12,8 @@ if (!gotTheLock) {
   writeLog("Another instance is already running. Exiting second instance.");
   app.quit();
   process.exit(0);
+}
+
 // Isolate Widget userData directory so it never overwrites Antigravity DevToolsActivePort
 try {
   app.setPath('userData', path.join(app.getPath('appData'), 'WorkCountdownWidgetAppData'));
