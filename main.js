@@ -261,6 +261,26 @@ ipcMain.on('fetch-claude-quota', async (event) => {
   }
 });
 
+// Automatic 12-second fast quota polling so AI usage reflects in real time!
+let quotaFastPollInterval = null;
+app.whenReady().then(() => {
+  setTimeout(() => {
+    fetchClaudeQuota().then(quotaData => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('claude-quota-data', quotaData);
+      }
+    });
+    quotaFastPollInterval = setInterval(async () => {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        try {
+          const quotaData = await fetchClaudeQuota();
+          mainWindow.webContents.send('claude-quota-data', quotaData);
+        } catch(e) {}
+      }
+    }, 12000);
+  }, 2000);
+});
+
 function startMouseJiggle() {
   if (mouseJiggleInterval) return; // Already running
   // Also block app suspension

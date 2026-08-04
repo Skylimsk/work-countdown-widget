@@ -231,11 +231,14 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
 
     claudeSessionBar.style.width = isOffline ? '0%' : `${cSessionBarWidth}%`;
     claudeSessionVal.textContent = isOffline ? 'N/A' : `${cSessionRemaining}%`;
-    claudeSessionReset.textContent = isOffline ? 'offline' : (claudeData.sessionReset ? `refresh in ${formatTimeRemaining(claudeData.sessionReset)}` : 'refresh in --');
+    function renderRefreshText(txt) {
+      if (!txt) return 'refresh in --';
+      if (txt.startsWith('refresh in') || txt.startsWith('ERR:')) return txt;
+      return `refresh in ${txt}`;
+    }
 
-    claudeWeeklyBar.style.width = isOffline ? '0%' : `${cWeeklyBarWidth}%`;
-    claudeWeeklyVal.textContent = isOffline ? 'N/A' : `${cWeeklyRemaining}%`;
-    claudeWeeklyReset.textContent = isOffline ? 'offline' : (claudeData.weeklyReset ? `refresh in ${formatTimeRemaining(claudeData.weeklyReset)}` : 'refresh in --');
+    claudeSessionReset.textContent = isOffline ? 'offline' : renderRefreshText(formatTimeRemaining(claudeData.sessionReset));
+    claudeWeeklyReset.textContent = isOffline ? 'offline' : renderRefreshText(formatTimeRemaining(claudeData.weeklyReset));
 
     // 2. Render Google Antigravity - Gemini Models
     const agGeminiData = data.antigravityGemini || { session: 100, weekly: 100 };
@@ -246,11 +249,11 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
 
     agGeminiSessionBar.style.width = `${aggSessionBarWidth}%`;
     agGeminiSessionVal.textContent = `${aggSession}%`;
-    if (agGeminiSessionReset) agGeminiSessionReset.textContent = agGeminiData.sessionResetText ? `refresh in ${agGeminiData.sessionResetText}` : 'refresh in --';
+    if (agGeminiSessionReset) agGeminiSessionReset.textContent = renderRefreshText(agGeminiData.sessionResetText);
 
     agGeminiWeeklyBar.style.width = `${aggWeeklyBarWidth}%`;
     agGeminiWeeklyVal.textContent = `${aggWeekly}%`;
-    if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = agGeminiData.weeklyResetText ? `refresh in ${agGeminiData.weeklyResetText}` : 'refresh in --';
+    if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = renderRefreshText(agGeminiData.weeklyResetText);
 
     // 3. Render Google Antigravity - Claude & GPT Models
     const agClaudeData = data.antigravityClaudeGpt || { session: 100, weekly: 100 };
@@ -261,11 +264,11 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
 
     agClaudeSessionBar.style.width = `${agcSessionBarWidth}%`;
     agClaudeSessionVal.textContent = `${agcSession}%`;
-    if (agClaudeSessionReset) agClaudeSessionReset.textContent = agClaudeData.sessionResetText ? `refresh in ${agClaudeData.sessionResetText}` : 'refresh in --';
+    if (agClaudeSessionReset) agClaudeSessionReset.textContent = renderRefreshText(agClaudeData.sessionResetText);
 
     agClaudeWeeklyBar.style.width = `${agcWeeklyBarWidth}%`;
     agClaudeWeeklyVal.textContent = `${agcWeekly}%`;
-    if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = agClaudeData.weeklyResetText ? `refresh in ${agClaudeData.weeklyResetText}` : 'refresh in --';
+    if (agClaudeWeeklyReset) agClaudeWeeklyReset.textContent = renderRefreshText(agClaudeData.weeklyResetText);
 
     // 4. Render Cursor IDE
     if (data.cursor) {
