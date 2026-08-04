@@ -437,13 +437,12 @@ function applyQuotaLayout() {
 
   if (showWeekly) {
     claudeWeeklyRow.classList.remove('hidden');
-    agGeminiWeeklyRow.classList.remove('hidden');
-    agClaudeWeeklyRow.classList.remove('hidden');
   } else {
     claudeWeeklyRow.classList.add('hidden');
-    agGeminiWeeklyRow.classList.add('hidden');
-    agClaudeWeeklyRow.classList.add('hidden');
   }
+  // Antigravity official API does not provide weekly limits, always hide dummy weekly rows!
+  agGeminiWeeklyRow.classList.add('hidden');
+  agClaudeWeeklyRow.classList.add('hidden');
 
   if (showQuota) {
     quotaSection.classList.remove('hidden');
@@ -457,7 +456,7 @@ function applyQuotaLayout() {
 
     let totalCardHeight = 0;
     if (claudeVisible) totalCardHeight += showWeekly ? 90 : 55;
-    if (agVisible) totalCardHeight += showWeekly ? 180 : 120;
+    if (agVisible) totalCardHeight += 120;
     if (cursorVisible) totalCardHeight += 55;
     if (chatgptVisible) totalCardHeight += 55;
     if (apiVisible) totalCardHeight += 55;
