@@ -133,16 +133,38 @@ async function fetchClaudeQuota() {
               } else {
                 function formatTimeRemaining(isoStr) {
                   if (!isoStr) return '';
-                  const diffMs = new Date(isoStr).getTime() - Date.now();
+                  const targetDate = new Date(isoStr);
+                  const diffMs = targetDate.getTime() - Date.now();
                   if (diffMs <= 0) return 'ready';
+
                   const totalMins = Math.floor(diffMs / (1000 * 60));
                   const days = Math.floor(totalMins / (60 * 24));
                   const hours = Math.floor((totalMins % (60 * 24)) / 60);
                   const mins = totalMins % 60;
 
-                  if (days > 0) return `${days}d ${hours}h`;
-                  if (hours > 0) return `${hours}h ${mins}m`;
-                  return `${mins}m`;
+                  let countdownStr = '';
+                  if (days > 0) countdownStr = `${days}d ${hours}h`;
+                  else if (hours > 0) countdownStr = `${hours}h ${mins}m`;
+                  else countdownStr = `${mins}m`;
+
+                  const now = new Date();
+                  const timeStr = targetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+                  
+                  let datePrefix = '';
+                  const isToday = now.toDateString() === targetDate.toDateString();
+                  const tomorrow = new Date(now);
+                  tomorrow.setDate(now.getDate() + 1);
+                  const isTomorrow = tomorrow.toDateString() === targetDate.toDateString();
+
+                  if (isToday) {
+                    datePrefix = 'Today';
+                  } else if (isTomorrow) {
+                    datePrefix = 'Tomorrow';
+                  } else {
+                    datePrefix = targetDate.toLocaleDateString([], { weekday: 'short' });
+                  }
+
+                  return `${countdownStr} (${datePrefix} ${timeStr})`;
                 }
 
                 quotaCache.antigravityGemini = {

@@ -160,9 +160,9 @@ let showWeekly = config.showWeekly !== false;
 
 function formatTimeRemaining(isoResetString) {
   if (!isoResetString) return 'refresh in --';
-  const resetTime = new Date(isoResetString).getTime();
-  const now = new Date().getTime();
-  const diffMs = resetTime - now;
+  const targetDate = new Date(isoResetString);
+  const now = new Date();
+  const diffMs = targetDate.getTime() - now.getTime();
 
   if (diffMs <= 0) return 'resetting...';
 
@@ -171,9 +171,28 @@ function formatTimeRemaining(isoResetString) {
   const mins = diffMins % 60;
   const days = Math.floor(hours / 24);
 
-  if (days >= 1) return `refresh in ${days}d ${hours % 24}h`;
-  if (hours >= 1) return `refresh in ${hours}h ${mins}m`;
-  return `refresh in ${mins}m`;
+  let countdownStr = '';
+  if (days >= 1) countdownStr = `${days}d ${hours % 24}h`;
+  else if (hours >= 1) countdownStr = `${hours}h ${mins}m`;
+  else countdownStr = `${mins}m`;
+
+  const timeStr = targetDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+  
+  let datePrefix = '';
+  const isToday = now.toDateString() === targetDate.toDateString();
+  const tomorrow = new Date(now);
+  tomorrow.setDate(now.getDate() + 1);
+  const isTomorrow = tomorrow.toDateString() === targetDate.toDateString();
+
+  if (isToday) {
+    datePrefix = 'Today';
+  } else if (isTomorrow) {
+    datePrefix = 'Tomorrow';
+  } else {
+    datePrefix = targetDate.toLocaleDateString([], { weekday: 'short' });
+  }
+
+  return `${countdownStr} (${datePrefix} ${timeStr})`;
 }
 
 // Listen for Separate AI Quota Data & Process Status
