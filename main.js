@@ -359,9 +359,28 @@ app.whenReady().then(() => {
     }, 1000);
   }, 1000);
 
+function isNonWorkingTime() {
+  const day = new Date().getDay();
+  if (day === 0 || day === 6) return true; // Weekend is non-working time
+
+  const cfg = loadConfig();
+  const now = new Date();
+  const currentMins = now.getHours() * 60 + now.getMinutes();
+
+  const [sH, sM] = (cfg.startTime || '09:00').split(':').map(Number);
+  const [eH, eM] = (cfg.endTime || '18:00').split(':').map(Number);
+  const startMins = sH * 60 + sM;
+  const endMins = eH * 60 + eM;
+
+  return currentMins < startMins || currentMins >= endMins;
+}
+
   // Non-working hours / Weekend dev-app smart activity detector
   setInterval(() => {
     if (!mainWindow || mainWindow.isDestroyed()) return;
+    // STRICT GUARD: Only run during actual off-hours or weekends!
+    if (!isNonWorkingTime()) return;
+
     const { exec } = require('child_process');
     const targetApps = ['cursor.exe', 'antigravity.exe', 'code.exe', 'idea64.exe', 'pycharm64.exe', 'devenv.exe', 'webstorm64.exe'];
     

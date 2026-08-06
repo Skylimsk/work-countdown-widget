@@ -886,7 +886,19 @@ ipcRenderer.on('spotify-update', (event, data) => {
 });
 
 ipcRenderer.on('non-working-app-active', () => {
-  if (!isOtPromptAnswered && !isSettingsOpen) {
+  const now = new Date();
+  const day = now.getDay();
+  const isWeekendDay = (day === 0 || day === 6);
+
+  const [sH, sM] = (config.startTime || '09:00').split(':').map(Number);
+  const [eH, eM] = (config.endTime || '18:00').split(':').map(Number);
+  const currentMins = now.getHours() * 60 + now.getMinutes();
+  const startMins = sH * 60 + sM;
+  const endMins = eH * 60 + eM;
+
+  const isOffHours = isWeekendDay || (currentMins < startMins || currentMins >= endMins);
+
+  if (isOffHours && !isOtPromptAnswered && !isSettingsOpen) {
     otPromptView.classList.remove('hidden');
     applyQuotaLayout();
   }
