@@ -576,8 +576,8 @@ function updateTimer() {
       lastRestReminderTime = Date.now();
       playRestChime();
       try {
-        new Notification("☕ 休息提示", {
-          body: "您已连续专注使用 30 分钟啦！建议揉揉眼睛，站起来活动一下身体哦~"
+        new Notification("☕ 30-Minute Rest Reminder", {
+          body: "You've been focused for 30 minutes! Take a break to rest your eyes and stretch your legs."
         });
       } catch(e) {}
     }
