@@ -83,12 +83,6 @@ function setupPowerMonitor() {
 }
 
 function createWindow() {
-  if (isWeekend()) {
-    writeLog("Weekend detected. Skipping widget launch.");
-    app.quit();
-    return;
-  }
-
   const userConfig = loadConfig();
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: workWidth, height: workHeight } = primaryDisplay.workAreaSize;
@@ -364,4 +358,25 @@ app.whenReady().then(() => {
       }
     }, 1000);
   }, 1000);
+
+  // Non-working hours / Weekend dev-app smart activity detector
+  setInterval(() => {
+    if (!mainWindow || mainWindow.isDestroyed()) return;
+    const { exec } = require('child_process');
+    const targetApps = ['cursor.exe', 'antigravity.exe', 'code.exe', 'idea64.exe', 'pycharm64.exe', 'devenv.exe', 'webstorm64.exe'];
+    
+    exec('tasklist /NH', { timeout: 3000 }, (err, stdout) => {
+      if (err || !stdout) return;
+      const lower = stdout.toLowerCase();
+      const hasDevApp = targetApps.some(app => lower.includes(app));
+      
+      if (hasDevApp) {
+        if (!mainWindow.isVisible()) {
+          mainWindow.show();
+          mainWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+        }
+        mainWindow.webContents.send('non-working-app-active', { hasDevApp: true });
+      }
+    });
+  }, 10000);
 });

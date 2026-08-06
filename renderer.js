@@ -415,9 +415,44 @@ btnSaveSettings.addEventListener('click', () => {
   refreshQuota();
 });
 
+let isStudyLeisureMode = false;
+let studyStartTime = null;
+let lastRestReminderTime = null;
+
+function playRestChime() {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) return;
+    const ctx = new AudioCtx();
+    
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(659.25, ctx.currentTime);
+    gain1.gain.setValueAtTime(0.2, ctx.currentTime);
+    gain1.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(ctx.currentTime);
+    osc1.stop(ctx.currentTime + 1.2);
+
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(987.77, ctx.currentTime + 0.16);
+    gain2.gain.setValueAtTime(0.2, ctx.currentTime + 0.16);
+    gain2.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.16);
+    osc2.stop(ctx.currentTime + 1.5);
+  } catch(e) {}
+}
+
 btnConfirmOtYes.addEventListener('click', () => {
   isOtPromptAnswered = true;
   isUserWorkingOt = true;
+  isStudyLeisureMode = false;
   otPromptView.classList.add('hidden');
   applyQuotaLayout();
 });
@@ -425,9 +460,11 @@ btnConfirmOtYes.addEventListener('click', () => {
 btnConfirmOtNo.addEventListener('click', () => {
   isOtPromptAnswered = true;
   isUserWorkingOt = false;
+  isStudyLeisureMode = true;
+  studyStartTime = Date.now();
+  lastRestReminderTime = Date.now();
   otPromptView.classList.add('hidden');
-  // Auto Close Widget App when user selects NOT working OT!
-  ipcRenderer.send('close-app');
+  applyQuotaLayout();
 });
 
 btnDismissParty.addEventListener('click', () => {
@@ -518,6 +555,37 @@ function updateTimer() {
   const now = new Date();
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
   const currentSeconds = now.getSeconds();
+
+  if (isStudyLeisureMode) {
+    statusDot.className = 'status-indicator paused';
+    statusDot.title = 'Mode: Study & Leisure (Non-OT)';
+    phaseEmoji.textContent = '☕';
+
+    const elapsedMs = Date.now() - (studyStartTime || Date.now());
+    const totalSecs = Math.floor(elapsedMs / 1000);
+    const hrs = Math.floor(totalSecs / 3600);
+    const mins = Math.floor((totalSecs % 3600) / 60);
+    const secs = totalSecs % 60;
+
+    phaseTime.textContent = `${String(hrs).padStart(2, '0')}:${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    progressBar.style.width = `${Math.min(100, (totalSecs % 1800) / 1800 * 100)}%`; // 30 min cycle fill
+    otPayRow.classList.add('hidden');
+
+    // 30-Minute Rest Reminder & Chime
+    if (lastRestReminderTime && (Date.now() - lastRestReminderTime >= 30 * 60 * 1000)) {
+      lastRestReminderTime = Date.now();
+      playRestChime();
+      try {
+        new Notification("☕ 休息提示", {
+          body: "您已连续专注使用 30 分钟啦！建议揉揉眼睛，站起来活动一下身体哦~"
+        });
+      } catch(e) {}
+    }
+
+    ipcRenderer.send('update-tray-tooltip', `Study Time: ${mins}m`);
+    applyQuotaLayout();
+    return;
+  }
 
   const [startH, startM] = config.startTime.split(':').map(Number);
   const [endH, endM] = config.endTime.split(':').map(Number);
@@ -815,6 +883,13 @@ function updateSpotifyUI(data) {
 
 ipcRenderer.on('spotify-update', (event, data) => {
   updateSpotifyUI(data);
+});
+
+ipcRenderer.on('non-working-app-active', () => {
+  if (!isOtPromptAnswered && !isSettingsOpen) {
+    otPromptView.classList.remove('hidden');
+    applyQuotaLayout();
+  }
 });
 
 btnSpotifyPlay.addEventListener('click', () => {
