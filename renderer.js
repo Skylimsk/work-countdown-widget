@@ -540,12 +540,28 @@ function refreshQuota() {
   ipcRenderer.send('fetch-claude-quota');
 }
 
+let currentCaffeinePulses = 0;
+
+ipcRenderer.on('caffeine-pulse', (event, data) => {
+  if (data && data.count !== undefined) {
+    currentCaffeinePulses = data.count;
+  } else {
+    currentCaffeinePulses++;
+  }
+  caffeineIcon.title = `☕ Caffeine Active: ${currentCaffeinePulses} pulses (Teams keep-alive active)`;
+  
+  caffeineIcon.classList.remove('caffeine-pulse');
+  void caffeineIcon.offsetWidth; // Force reflow
+  caffeineIcon.classList.add('caffeine-pulse');
+});
+
 // Check Caffeine & Update Status
 function updateCaffeineState() {
   const isEnabled = checkKeepAwake.checked;
   ipcRenderer.send('set-keep-awake', isEnabled);
   if (isEnabled) {
     caffeineIcon.classList.remove('hidden');
+    caffeineIcon.title = `☕ Caffeine Active: ${currentCaffeinePulses} pulses (Teams keep-alive active)`;
   } else {
     caffeineIcon.classList.add('hidden');
   }
