@@ -21,13 +21,26 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 - **OT Pay Calculator**: Live calculation of extra earnings during overtime based on your monthly or hourly rate and OT multipliers ($1.5\times$, $2.0\times$).
 - **Lunch Break Mode**: Automatic phase switching (Work 💻 → Lunch 🍱 → Work 💻 → Party Time 🎉).
 
+## 🚀 What's New in v2.0.0 (Major Release)
+
+- **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
+- **🎵 Standalone Spotify Control (No Desktop EXE Needed)**: Integrates Spotify OAuth Web API so you can control playback across phone/tablet/web devices even without running the Spotify desktop app!
+- **🌐 Offline Protection (Without Internet)**: Handles network disconnections gracefully—removes quota cards and web services smoothly without crashing or showing corrupted UI.
+- **⚡ 12s Extreme Real-Time Quota Polling**: High-frequency polling updates AI remaining quotas in real-time as you write code and prompts.
+- **🕒 Estimated Reset Date & Time Display**: When a quota is exhausted (0%), the empty bar displays exact formatted reset timings like `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`.
+- **🎵 Spotify Curved Adaptive Player**: Floating rounded player with 60FPS smooth progress animation, zero pause-jittering, and adaptive Light/Dark mode.
+- **⏰ Smart Off-Hours Auto-Awake & 30-Min Rest Chime (🔔)**: Auto-awakens on off-hours/weekends when dev apps (Cursor, Antigravity, VS Code, etc.) launch. Features **Study & Leisure Mode** with duration tracking and a pleasant 2-tone audio chime (🔔) every 30 minutes!
+- **🌐 100% Crisp English UI Localization**: All modals, buttons, tooltips, and rest notifications localized to 100% clear English.
+
 ### 🧠 Universal Real-Time AI Quota Monitor
 - **Google Antigravity & Standalone Claude**: Tracks 5-Hour dynamic session limits and remaining percentage for Gemini 3.6/3.5, Claude Sonnet/Opus 4.6, and GPT models.
 - **12-Second Fast Polling**: Background quota sync updates every 12 seconds so your prompt usage is instantly reflected.
 - **Estimated Reset Date & Time**: When a quota is exhausted (0%), the bar displays the formatted countdown alongside exact completion time (e.g., `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`).
 - **Raw Error Transparency**: Direct API error reporting (e.g., `ERR: DevTools Port Disconnected`) instead of masking data with false 100% fallbacks.
+- **🌐 Offline Protection (Without Internet)**: If internet connectivity is disconnected, remote AI quotas and web services gracefully hide or display `Offline` status without crashing the widget.
 
 ### 🎵 Spotify Theme-Adaptive Floating Card
+- **No Desktop EXE Required**: Connects seamlessly via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player even if the Spotify desktop app is not running!
 - **Dynamic Theme Matching**: Cards dynamically adapt to Light/Dark mode (`var(--bg-card)`), keeping text readable without forced album colors.
 - **60FPS Monotonic Interpolation**: Smooth progress bar movement without jittering or jumping backward.
 - **Pause State Freeze**: Automatically freezes animation frames when playback is paused to eliminate millisecond time fluctuations.
