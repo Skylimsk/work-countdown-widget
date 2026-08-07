@@ -1,7 +1,7 @@
-# ⏱️ Work Countdown & Universal AI Quota Widget (v2.0.0)
+# ⏱️ Work Countdown & Universal AI Quota Widget (v2.0.1)
 
-[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=10b981&style=for-the-badge)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.0)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078d4?style=for-the-badge&logo=windows)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)
+[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=10b981&style=for-the-badge)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.1)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078d4?style=for-the-badge&logo=windows)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe)
 [![License](https://img.shields.io/badge/License-MIT-6366f1?style=for-the-badge)](LICENSE)
 
 A sleek, floating, non-intrusive desktop widget built with Electron. It combines **work end-time countdowns**, **overtime (OT) pay calculators**, **real-time AI model quota monitoring**, **theme-adaptive Spotify controls**, and **smart health rest reminders**.
@@ -10,7 +10,7 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 
 ---
 
-👉 **[⬇️ Download Latest Installer: WorkCountdownWidgetSetup.exe (v2.0.0)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)**
+👉 **[⬇️ Download Latest Installer: WorkCountdownWidgetSetup.exe (v2.0.1)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe)**
 
 ---
 
@@ -21,7 +21,7 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 - **OT Pay Calculator**: Live calculation of extra earnings during overtime based on your monthly or hourly rate and OT multipliers ($1.5\times$, $2.0\times$).
 - **Lunch Break Mode**: Automatic phase switching (Work 💻 → Lunch 🍱 → Work 💻 → Party Time 🎉).
 
-## 🚀 What's New in v2.0.0 (Major Release)
+## 🚀 What's New in v2.0.1 (Major Release)
 
 - **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
 - **🎵 Standalone Spotify Control (Login Required)**: Connects via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player without running the Spotify desktop exe! Simply click **Login with Spotify** in the Settings panel to authenticate your account.
@@ -78,7 +78,7 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 
 ## 🚀 Quick Start & Installation
 
-1. **Download**: Grab the latest [`WorkCountdownWidgetSetup.exe`](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe).
+1. **Download**: Grab the latest [`WorkCountdownWidgetSetup.exe`](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe).
 2. **Install**: Double-click the installer. It will automatically set up and launch the floating widget.
 3. **Auto-Start**: Upon first launch or update, the application automatically registers with Windows Registry (`setLoginItemSettings`) for seamless startup.
 
