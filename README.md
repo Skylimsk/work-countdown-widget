@@ -1,9 +1,22 @@
-# ⏳ Work Countdown & Universal AI Quota Desktop Widget
-> A sleek, floating Windows desktop widget counting down to your work end time & lunch breaks, while real-time monitoring your AI Quotas (Claude, Google Antigravity Gemini & Claude/GPT models) and integrating seamlessly with Spotify!
+# ⏱️ Work Countdown & Universal AI Quota Desktop Widget (v2.0.0)
 
-![License](https://img.shields.io/badge/License-MIT-blue.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows-0078D6.svg)
-![Electron](https://img.shields.io/badge/Electron-v31.7.7-47848F.svg)
+[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=emerald&style=flat-square)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.0)
+[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+
+A sleek, floating desktop widget counting down to your work end time, tracking **Overtime (OT) Extra Pay**, monitoring **Universal AI Quotas (Google Antigravity & Claude)** in real-time, displaying **Spotify Now Playing**, and offering **Smart Off-Hours Dev-App Auto-Awake with 30-Minute Audio Rest Reminders (🔔)**!
+
+👉 **[⬇️ Download Single WorkCountdownWidgetSetup.exe Installer (v2.0.0)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)**
+
+---
+
+## 🚀 What's New in v2.0.0 (Major Release)
+
+- **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
+- **⚡ 12s Extreme Real-Time Quota Polling**: High-frequency polling updates AI remaining quotas in real-time as you write code and prompts.
+- **🕒 Estimated Reset Date & Time Display**: When a quota is exhausted (0%), the empty bar displays exact formatted reset timings like `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`.
+- **🎵 Spotify Curved Adaptive Player**: Floating rounded player with 60FPS smooth progress animation, zero pause-jittering, and adaptive Light/Dark mode.
+- **⏰ Smart Off-Hours Auto-Awake & 30-Min Rest Chime (🔔)**: Auto-awakens on off-hours/weekends when dev apps (Cursor, Antigravity, VS Code, etc.) launch. Features **Study & Leisure Mode** with duration tracking and a pleasant 2-tone audio chime (🔔) every 30 minutes!
+- **🌐 100% Crisp English UI Localization**: All modals, buttons, tooltips, and rest notifications localized to 100% clear English.
 
 ---
 
