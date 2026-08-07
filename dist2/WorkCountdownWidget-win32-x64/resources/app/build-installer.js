@@ -9,7 +9,7 @@ async function buildInstaller() {
   console.log('📦 Building standalone single WorkCountdownWidgetSetup.exe...');
   try {
     await electronInstaller.createWindowsInstaller({
-      appDirectory: path.join(__dirname, 'dist', 'WorkCountdownWidget-win32-x64'),
+      appDirectory: path.join(__dirname, 'dist2', 'WorkCountdownWidget-win32-x64'),
       outputDirectory: path.join(__dirname, 'dist', 'installer'),
       authors: 'Skylim',
       exe: 'WorkCountdownWidget.exe',

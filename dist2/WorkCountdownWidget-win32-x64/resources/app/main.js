@@ -276,6 +276,8 @@ app.whenReady().then(() => {
   }, 2000);
 });
 
+let caffeineActiveCount = 0;
+
 function startMouseJiggle() {
   if (mouseJiggleInterval) return; // Already running
   // Also block app suspension
@@ -293,6 +295,10 @@ function startMouseJiggle() {
         Start-Sleep -Milliseconds 100;
         [System.Windows.Forms.Cursor]::Position = New-Object System.Drawing.Point($p.X, $p.Y);
       "`, { timeout: 5000 });
+      caffeineActiveCount++;
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send('caffeine-pulse', { count: caffeineActiveCount });
+      }
     } catch (e) {
       writeLog(`Mouse jiggle error: ${e.message}`);
     }
