@@ -144,35 +144,32 @@ html, body {
   align-items: center;
   justify-content: center;
   gap: 2px;
-  min-width: 0;
-  overflow: hidden;
+  min-width: max-content;
 }
 .phase-emoji {
-  font-size: 11px;
+  font-size: 10.5px;
   font-family: 'Segoe UI Emoji','Apple Color Emoji',sans-serif;
   flex-shrink: 0;
   line-height: 1;
 }
 .phase-time {
   font-family: 'JetBrains Mono','Consolas',monospace;
-  font-size: clamp(11.5px, 6.5vw, 15.5px);
+  font-size: 13px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.2px;
+  letter-spacing: -0.3px;
   color: var(--text-1);
   line-height: 1;
   text-shadow: 0 0 22px var(--day-glow);
   transition: text-shadow var(--ease-slow);
-  flex-shrink: 1;
+  flex-shrink: 0;
   white-space: nowrap;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: clip;
 }
 
-/* Narrow window container protection */
-@media (max-width: 185px) {
-  .drag-handle { padding: 4px 4px 4px 4px; gap: 1px; }
+/* Narrow window container protection — 100% prevent zero/exclamation truncation */
+@media (max-width: 195px) {
+  .drag-handle { padding: 4px 4px 4px 4px; gap: 2px; }
+  .phase-emoji { display: none; } /* Hide emoji when very narrow to give 100% space to numbers! */
   .phase-time { font-size: 12px; letter-spacing: -0.4px; }
   .control-btn { width: 14px; height: 14px; font-size: 8.5px; }
 }

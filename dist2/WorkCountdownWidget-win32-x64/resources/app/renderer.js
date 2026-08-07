@@ -250,7 +250,7 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     claudeWeeklyReset.textContent = isOffline ? 'offline' : renderRefreshText(formatTimeRemaining(claudeData.weeklyReset));
 
     // 2. Render Google Antigravity - Gemini Models
-    const agGeminiData = data.antigravityGemini || { session: 100, weekly: 100 };
+    const agGeminiData = data.antigravityGemini || { session: 0, weekly: 0 };
     const aggSession = Number(agGeminiData.session);
     const aggWeekly = Number(agGeminiData.weekly);
 
@@ -263,7 +263,7 @@ ipcRenderer.on('claude-quota-data', (event, data) => {
     if (agGeminiWeeklyReset) agGeminiWeeklyReset.textContent = renderRefreshText(agGeminiData.weeklyResetText);
 
     // 3. Render Google Antigravity - Claude & GPT Models
-    const agClaudeData = data.antigravityClaudeGpt || { session: 100, weekly: 100 };
+    const agClaudeData = data.antigravityClaudeGpt || { session: 0, weekly: 0 };
     const agcSession = Number(agClaudeData.session);
     const agcWeekly = Number(agClaudeData.weekly);
 

@@ -16,8 +16,8 @@ let quotaCache = {
   claudeRunning: true,
   antigravityRunning: true,
   claude: { session: 0, weekly: 0, sessionReset: '', weeklyReset: '' },
-  antigravityGemini: { session: 100, weekly: 100, sessionResetText: '' },
-  antigravityClaudeGpt: { session: 100, weekly: 100, sessionResetText: '' },
+  antigravityGemini: { session: 0, weekly: 0, sessionResetText: 'Connecting...' },
+  antigravityClaudeGpt: { session: 0, weekly: 0, sessionResetText: 'Connecting...' },
   cursor: { fastPct: 100, numRequests: 0, maxRequests: 500 },
   error: null
 };
