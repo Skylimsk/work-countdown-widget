@@ -877,15 +877,43 @@ function updateSpotifyUI(data) {
   // Synchronize real play/pause state from Windows Media Session
   spotifyIsPlaying = !data.paused;
 
-  // Show track name always
+  // Show track name always and update title tooltips for full song visibility
   if (data.track) {
+    const fullText = `${data.track}${data.artist ? ' - ' + data.artist : ''}`;
     spotifyTrack.textContent = data.track;
     spotifyArtist.textContent = data.artist || '';
+    spotifyBar.title = fullText;
+    spotifyTrack.title = data.track;
+    spotifyArtist.title = data.artist || '';
     spotifyLastTrack = data.track + '|' + (data.artist || '');
     applyArtistTheme(data.artist);
+
+    // Smart marquee text scrolling for narrow window protection
+    setTimeout(() => {
+      if (spotifyTrack.scrollWidth > spotifyTrack.clientWidth + 2) {
+        const offset = spotifyTrack.scrollWidth - spotifyTrack.clientWidth + 16;
+        spotifyTrack.style.setProperty('--marquee-offset', `-${offset}px`);
+        spotifyTrack.classList.add('marquee-active');
+      } else {
+        spotifyTrack.classList.remove('marquee-active');
+      }
+
+      if (spotifyArtist.scrollWidth > spotifyArtist.clientWidth + 2) {
+        const offset = spotifyArtist.scrollWidth - spotifyArtist.clientWidth + 14;
+        spotifyArtist.style.setProperty('--marquee-offset', `-${offset}px`);
+        spotifyArtist.classList.add('marquee-active');
+      } else {
+        spotifyArtist.classList.remove('marquee-active');
+      }
+    }, 60);
   } else {
     spotifyTrack.textContent = 'Spotify';
     spotifyArtist.textContent = '';
+    spotifyBar.title = 'Spotify';
+    spotifyTrack.title = '';
+    spotifyArtist.title = '';
+    spotifyTrack.classList.remove('marquee-active');
+    spotifyArtist.classList.remove('marquee-active');
     applyArtistTheme('');
   }
 
