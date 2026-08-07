@@ -1,108 +1,86 @@
-# ⏱️ Work Countdown & Universal AI Quota Desktop Widget (v2.0.0)
+# ⏱️ Work Countdown & Universal AI Quota Widget (v2.0.0)
 
-[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=emerald&style=flat-square)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.0)
-[![License](https://img.shields.io/badge/license-MIT-blue?style=flat-square)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=10b981&style=for-the-badge)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.0)
+[![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078d4?style=for-the-badge&logo=windows)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)
+[![License](https://img.shields.io/badge/License-MIT-6366f1?style=for-the-badge)](LICENSE)
 
-A sleek, floating desktop widget counting down to your work end time, tracking **Overtime (OT) Extra Pay**, monitoring **Universal AI Quotas (Google Antigravity & Claude)** in real-time, displaying **Spotify Now Playing**, and offering **Smart Off-Hours Dev-App Auto-Awake with 30-Minute Audio Rest Reminders (🔔)**!
+A sleek, floating, non-intrusive desktop widget built with Electron. It combines **work end-time countdowns**, **overtime (OT) pay calculators**, **real-time AI model quota monitoring**, **theme-adaptive Spotify controls**, and **smart health rest reminders**.
 
-👉 **[⬇️ Download Single WorkCountdownWidgetSetup.exe Installer (v2.0.0)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)**
-
----
-
-## 🚀 What's New in v2.0.0 (Major Release)
-
-- **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
-- **⚡ 12s Extreme Real-Time Quota Polling**: High-frequency polling updates AI remaining quotas in real-time as you write code and prompts.
-- **🕒 Estimated Reset Date & Time Display**: When a quota is exhausted (0%), the empty bar displays exact formatted reset timings like `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`.
-- **🎵 Spotify Curved Adaptive Player**: Floating rounded player with 60FPS smooth progress animation, zero pause-jittering, and adaptive Light/Dark mode.
-- **⏰ Smart Off-Hours Auto-Awake & 30-Min Rest Chime (🔔)**: Auto-awakens on off-hours/weekends when dev apps (Cursor, Antigravity, VS Code, etc.) launch. Features **Study & Leisure Mode** with duration tracking and a pleasant 2-tone audio chime (🔔) every 30 minutes!
-- **🌐 100% Crisp English UI Localization**: All modals, buttons, tooltips, and rest notifications localized to 100% clear English.
+> 💡 **Designed for developers, creators, and remote workers who want complete control over their workday productivity and AI usage.**
 
 ---
 
-## ✨ Features Highlight
-
-### ⏰ Work & Overtime (OT) Countdown
-- **Dynamic Phase Tracking**:
-  - `⏰ Starts in Xh Ym` (Pre-work countdown)
-  - `🍽 → Lunch` (Phase 1: Countdown to lunch break)
-  - `🍽 Break ends in` (Lunch break active)
-  - `🏁 → End of Work` (Phase 2: Countdown to official work end)
-  - `🔥 +00:15:30` (Overtime prompt confirmation modal & live glowing red OT timer)
-- **Salary & OT Money Calculation**:
-  - Supports both **Hourly Rate** and **Monthly Salary** calculation modes.
-  - Automatically calculates extra money earned in real-time during Overtime!
-
-### 📊 Real-Time Universal AI Quota Monitor
-- **Claude Standalone App**: Live usage monitoring directly via official API token.
-- **Google Antigravity**:
-  - **Gemini Models**: Real-time 5-Hour & Weekly quota tracking (Remaining %).
-  - **Claude & GPT Models**: Real-time 5-Hour & Weekly quota tracking (Remaining %).
-  - Dynamic live updates anchored to local transcript logs as you chat!
-
-### 🎵 Spotify Dynamic Music Bar
-- **60 FPS Smooth Progress Bar**: Ultra-smooth song progress interpolation at 60 frames per second.
-- **Dynamic Album Theme Color Matching**: Automatically extracts the dominant solid color from each song's album art cover and dynamically re-themes the player card.
-- **Media Controls**: `⏮` Previous, `⏯` Play/Pause, `⏭` Next buttons directly on your desktop widget without switching windows.
-
-### ☕ Caffeine Keep-Awake (Anti-Away for Microsoft Teams)
-- Moves mouse by 1px and back every 3 minutes to simulate real user activity — keeps Microsoft Teams showing **Active (Green)** without display sleep.
-
-### 📱 Always-On Telegram Bot Integration
-- Control your widget and query your AI quotas remotely via Telegram commands!
-- Supports `/start`, `/quota`, `/status`, and inline interactive menu buttons. Can be toggled on/off in Settings.
-
-### ☀️ Light Mode & 🌙 Dark Mode
-- Instant header toggle button (`☀️`/`🌙`).
-- Premium frosted glassmorphism UI designed for both bright daytime working environments and sleek night setups.
+👉 **[⬇️ Download Latest Installer: WorkCountdownWidgetSetup.exe (v2.0.0)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe)**
 
 ---
 
-## 🚀 How to Use / Getting Started
+## ✨ Key Features & Capabilities
 
-### 1. Launching the App
-Double-click `WorkCountdownWidget.exe` to run. The widget will float in the bottom-right corner of your screen (Always on Top).
+### ⏱️ Workday & Overtime (OT) Pay Tracking
+- **Precision Countdown**: Real-time countdown to work end time and lunch breaks.
+- **OT Pay Calculator**: Live calculation of extra earnings during overtime based on your monthly or hourly rate and OT multipliers ($1.5\times$, $2.0\times$).
+- **Lunch Break Mode**: Automatic phase switching (Work 💻 → Lunch 🍱 → Work 💻 → Party Time 🎉).
 
-### 2. Header Controls Overview
-| Button | Icon | Function |
-|---|---|---|
-| **Theme Toggle** | `🌙` / `☀️` | Switch between Dark Mode and Light Mode |
-| **Quota Toggle** | `📊` | Expand/Collapse the AI Quota Panel |
-| **Settings** | `⚙️` | Open configuration panel |
-| **Minimize** | `–` | Minimize widget |
-| **Close** | `✕` | Close application |
+### 🧠 Universal Real-Time AI Quota Monitor
+- **Google Antigravity & Standalone Claude**: Tracks 5-Hour dynamic session limits and remaining percentage for Gemini 3.6/3.5, Claude Sonnet/Opus 4.6, and GPT models.
+- **12-Second Fast Polling**: Background quota sync updates every 12 seconds so your prompt usage is instantly reflected.
+- **Estimated Reset Date & Time**: When a quota is exhausted (0%), the bar displays the formatted countdown alongside exact completion time (e.g., `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`).
+- **Raw Error Transparency**: Direct API error reporting (e.g., `ERR: DevTools Port Disconnected`) instead of masking data with false 100% fallbacks.
 
-### 3. Settings Configuration (`⚙️`)
-Click `⚙️` to customize:
-- **Work Hours**: Start Time, End Time, Lunch Break duration.
-- **Overtime (OT)**: Hourly Rate / Monthly Salary, Work Days per Month, Work Hours per Day, OT Multiplier.
-- **Telegram Bot**: Toggle Telegram Bot notifications & polling on/off.
-- **Keep Awake (Caffeine)**: Keep Microsoft Teams Active.
+### 🎵 Spotify Theme-Adaptive Floating Card
+- **Dynamic Theme Matching**: Cards dynamically adapt to Light/Dark mode (`var(--bg-card)`), keeping text readable without forced album colors.
+- **60FPS Monotonic Interpolation**: Smooth progress bar movement without jittering or jumping backward.
+- **Pause State Freeze**: Automatically freezes animation frames when playback is paused to eliminate millisecond time fluctuations.
+- **Full Media Controls**: Play/Pause, Next, and Previous track controls via Windows Media Session & Spotify Web API.
 
----
+### ⏰ Smart Off-Hours Auto-Awake & Health Rest Reminder
+- **Automated Popup**: Automatically activates during off-hours or weekends when developer tools (Cursor, Antigravity, VS Code, IntelliJ, PyCharm) are opened.
+- **OT vs. Study Mode Prompt**: Modal dialog asks whether you are working OT (`🔥 Yes, Track Overtime`) or learning/studying (`☕ No, Free Usage`).
+- **30-Minute Rest Reminder (🔔)**: In Study Mode, duration is continuously tracked (**`☕ 00:25:14`**). Every 30 minutes, a pleasant 2-tone audio chime plays alongside a health break notification.
+- **Silent During Work Hours**: Strict time guards ensure zero false popups during regular working hours.
 
-## ⚠️ Important Notes & Troubleshooting
+### 🍵 PC Sleep Prevention & Teams Keep-Alive (Caffeine)
+- **Caffeine Toggle**: Prevents Windows display sleep and system standby while working.
+- **Teams Jiggle**: Optional subtle mouse activity pulse to keep Microsoft Teams status active.
 
-1. **Auto-Start on Boot**:
-   - The app automatically registers itself in the Windows Registry (`HKCU\Software\Microsoft\Windows\CurrentVersion\Run`).
-   - If Windows Defender or antivirus prompts a permission notice, please select **Allow**.
+### 📱 Telegram Bot Remote Control
+- **Remote Commands**: Interrogate AI quotas, trigger OT timers, or check current work status remotely via custom Telegram Bot commands.
 
-2. **Offline Mode**:
-   - If internet connection is lost, Claude API quota will display `N/A (offline)`.
-   - **Local Work Countdown, Overtime Timer, and Antigravity Quotas will continue to work 100% offline!**
-
-3. **Spotify Integration**:
-   - Spotify Desktop App must be open.
-   - If track name does not show immediately, play any track on Spotify to initiate Windows Media Session.
+### 🎨 Dynamic Day-of-Week Color Themes
+- **7 Daily Palettes**: Interface background gradients dynamically evolve every day of the week (e.g., Tuesday Emerald 💚, Friday Sunset Violet 🌆).
 
 ---
 
-## 📧 Support & Contact
+## 🛠️ Architecture & Tech Stack
 
-If you encounter any issues, bugs, or have feature suggestions, please feel free to reach out:
-
-📩 **Contact Developer**: [skylimsk@hotmail.com](mailto:skylimsk@hotmail.com)
+| Component | Technology Used |
+| :--- | :--- |
+| **Core Framework** | Electron v31.7.7 + Node.js |
+| **UI & Styling** | Vanilla HTML5 / CSS3 (CSS Variables & Glassmorphism) |
+| **Quota Service** | DevTools ActivePort WebSocket & Google LanguageServer Protocol |
+| **Music Integration**| Windows Media Session API (winsdk / Python) & Spotify Web API |
+| **Installer** | Squirrel `electron-winstaller` single Setup.exe |
 
 ---
-*Built with ❤️ by Skylim*
 
+## 🚀 Quick Start & Installation
+
+1. **Download**: Grab the latest [`WorkCountdownWidgetSetup.exe`](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.0/WorkCountdownWidgetSetup.exe).
+2. **Install**: Double-click the installer. It will automatically set up and launch the floating widget.
+3. **Auto-Start**: Upon first launch or update, the application automatically registers with Windows Registry (`setLoginItemSettings`) for seamless startup.
+
+---
+
+## ⚙️ Configuration & Customization
+
+Click the **⚙️ Settings Icon** on the top header bar to configure:
+- **Work Hours**: Set your daily Start Time, End Time, and Lunch Break interval.
+- **Overtime Rates**: Set Monthly Salary / Hourly Rate, Working Days per Month, Daily Hours, and OT Multiplier.
+- **AI Quota Services**: Toggle monitoring for Claude App, Antigravity, Cursor, ChatGPT, or DeepSeek API.
+- **Spotify & Caffeine**: Toggle Spotify player visibility and display sleep prevention.
+
+---
+
+## 📄 License
+
+Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
