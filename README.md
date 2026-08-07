@@ -24,7 +24,7 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 ## 🚀 What's New in v2.0.0 (Major Release)
 
 - **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
-- **🎵 Standalone Spotify Control (No Desktop EXE Needed)**: Integrates Spotify OAuth Web API so you can control playback across phone/tablet/web devices even without running the Spotify desktop app!
+- **🎵 Standalone Spotify Control (Login Required)**: Connects via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player without running the Spotify desktop exe! Simply click **Login with Spotify** in the Settings panel to authenticate your account.
 - **🌐 Offline Protection (Without Internet)**: Handles network disconnections gracefully—removes quota cards and web services smoothly without crashing or showing corrupted UI.
 - **⚡ 12s Extreme Real-Time Quota Polling**: High-frequency polling updates AI remaining quotas in real-time as you write code and prompts.
 - **🕒 Estimated Reset Date & Time Display**: When a quota is exhausted (0%), the empty bar displays exact formatted reset timings like `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`.
@@ -40,7 +40,7 @@ A sleek, floating, non-intrusive desktop widget built with Electron. It combines
 - **🌐 Offline Protection (Without Internet)**: If internet connectivity is disconnected, remote AI quotas and web services gracefully hide or display `Offline` status without crashing the widget.
 
 ### 🎵 Spotify Theme-Adaptive Floating Card
-- **No Desktop EXE Required**: Connects seamlessly via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player even if the Spotify desktop app is not running!
+- **No Desktop EXE Required (Login Required)**: Connects seamlessly via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player even if the Spotify desktop app is not running. *(Requires one-time Spotify Account Login via the Settings panel).*
 - **Dynamic Theme Matching**: Cards dynamically adapt to Light/Dark mode (`var(--bg-card)`), keeping text readable without forced album colors.
 - **60FPS Monotonic Interpolation**: Smooth progress bar movement without jittering or jumping backward.
 - **Pause State Freeze**: Automatically freezes animation frames when playback is paused to eliminate millisecond time fluctuations.
