@@ -6,6 +6,7 @@ const { loadConfig, saveConfig } = require('./store');
 const { fetchClaudeQuota, writeLog } = require('./quotaService');
 const { initTelegramBot, setBotActiveState, sendTelegramQuotaReport, ALLOWED_CHAT_ID } = require('./telegramBotService');
 const { getSpotifyNowPlaying, spotifyPlayPause, spotifyNext, spotifyPrev } = require('./spotifyService');
+const spotifyAuth = require('./spotifyAuth');
 
 const gotTheLock = app.requestSingleInstanceLock();
 if (!gotTheLock) {
@@ -87,7 +88,7 @@ function createWindow() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: workWidth, height: workHeight } = primaryDisplay.workAreaSize;
 
-  const defaultWidth = userConfig.width || 210;
+  const defaultWidth = userConfig.width || 170;
   const defaultHeight = userConfig.height || 330;
   const defaultX = workWidth - defaultWidth - 20;
   const defaultY = workHeight - defaultHeight - 20;
@@ -341,22 +342,148 @@ ipcMain.handle('spotify-now-playing', async () => {
   });
 });
 
-ipcMain.on('spotify-play-pause', () => { spotifyPlayPause(); });
-ipcMain.on('spotify-next',       () => { spotifyNext(); });
-ipcMain.on('spotify-prev',       () => { spotifyPrev(); });
+// Real Web API playback control when connected (requires Premium), falls back
+// to media-key simulation otherwise — tracked from the last poll so play/pause
+// knows which direction to command.
+let spotifyLastKnownPaused = true;
 
-// Spotify polling: push updates to renderer every 1 second
-let spotifyPollInterval = null;
+// A fallback media-key press is only safe when Spotify gave us a definitive
+// rejection (result.attempted). On a network exception (result.attempted ===
+// false) we don't know if the command already landed server-side, so we must
+// NOT also fire the media key — that ambiguity is what caused "next" to skip
+// two tracks (both the Web API call and the fallback executing).
+ipcMain.on('spotify-play-pause', async () => {
+  if (spotifyAuth.isConnected()) {
+    const result = await spotifyAuth.webPlayPause(!spotifyLastKnownPaused);
+    if (result.success) { refreshSpotifySoon(); return; }
+    if (!result.attempted) return;
+    spotifyPlayPause();
+    return;
+  }
+  spotifyPlayPause();
+});
+ipcMain.on('spotify-next', async () => {
+  if (spotifyAuth.isConnected()) {
+    const result = await spotifyAuth.webNext();
+    if (result.success) { refreshSpotifySoon(); return; }
+    if (!result.attempted) return;
+    spotifyNext();
+    return;
+  }
+  spotifyNext();
+});
+ipcMain.on('spotify-prev', async () => {
+  if (spotifyAuth.isConnected()) {
+    const result = await spotifyAuth.webPrevious();
+    if (result.success) { refreshSpotifySoon(); return; }
+    if (!result.attempted) return;
+    spotifyPrev();
+    return;
+  }
+  spotifyPrev();
+});
+
+// Spotify Web API — up-next queue + real playback control (Windows Media Session has neither)
+ipcMain.handle('spotify-auth-status', async () => {
+  return { connected: spotifyAuth.isConnected() };
+});
+
+ipcMain.handle('spotify-connect', async () => {
+  return new Promise((resolve) => {
+    spotifyAuth.startAuthFlow((result) => resolve(result));
+  });
+});
+
+ipcMain.on('spotify-disconnect', () => {
+  spotifyAuth.disconnect();
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('spotify-next-track', null);
+  }
+});
+
+ipcMain.handle('spotify-get-devices', async () => {
+  if (!spotifyAuth.isConnected()) return [];
+  return spotifyAuth.getDevices();
+});
+ipcMain.on('spotify-switch-device', async (event, deviceId) => {
+  await spotifyAuth.switchDevice(deviceId);
+  refreshSpotifySoon();
+});
+ipcMain.on('spotify-set-volume', (event, percent) => {
+  spotifyAuth.setVolume(percent);
+});
+ipcMain.on('spotify-seek', (event, positionMs) => {
+  spotifyAuth.seek(positionMs);
+});
+
+// Push the current now-playing state to the renderer. When connected, the
+// Web API's track/artist/paused/progress/volume are authoritative — the local
+// Windows Media Session (SMTC) can lag several seconds behind a remotely
+// issued command (e.g. right after a Web API skip), and its paused status is
+// known to misreport for Spotify. It also works when spotify.exe isn't even
+// running locally (e.g. controlling Spotify open on your phone), so an active
+// Web API device takes over showing/driving the card in that case too.
+function pushSpotifyNowPlaying() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  getSpotifyNowPlaying((localData) => {
+    if (spotifyAuth.isConnected()) {
+      spotifyAuth.getPlayerState().then((state) => {
+        if (state && state.active) {
+          localData.running = true;
+          localData.paused = !state.isPlaying;
+          localData.position_sec = state.progressMs / 1000;
+          if (state.durationMs) localData.duration_sec = state.durationMs / 1000;
+          localData.volumePercent = state.volumePercent;
+          localData.deviceName = state.deviceName;
+          if (state.track) {
+            localData.track = state.track;
+            localData.artist = state.artist;
+          }
+        }
+        spotifyLastKnownPaused = !!localData.paused;
+        if (mainWindow && !mainWindow.isDestroyed()) {
+          mainWindow.webContents.send('spotify-update', localData);
+        }
+      }).catch(() => {
+        spotifyLastKnownPaused = !!localData.paused;
+        if (mainWindow && !mainWindow.isDestroyed()) mainWindow.webContents.send('spotify-update', localData);
+      });
+    } else {
+      spotifyLastKnownPaused = !!localData.paused;
+      mainWindow.webContents.send('spotify-update', localData);
+    }
+  });
+}
+
+function pushSpotifyNextTrack() {
+  if (!spotifyAuth.isConnected() || !mainWindow || mainWindow.isDestroyed()) return;
+  spotifyAuth.getNextTrack().then((next) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('spotify-next-track', next);
+    }
+  });
+}
+
+// After a command actually changes something (skip/prev), refresh right away
+// instead of waiting for the next scheduled poll — Spotify's servers are
+// usually caught up within a few hundred ms of accepting the command.
+function refreshSpotifySoon() {
+  setTimeout(() => {
+    pushSpotifyNowPlaying();
+    pushSpotifyNextTrack();
+  }, 400);
+}
+
+// Spotify polling: push now-playing + up-next updates to renderer every 4 seconds
 app.whenReady().then(() => {
+  configureAutoStart();
+  
   // Start spotify polling after window ready
   setTimeout(() => {
     spotifyPollInterval = setInterval(() => {
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        getSpotifyNowPlaying((data) => {
-          mainWindow.webContents.send('spotify-update', data);
-        });
-      }
-    }, 1000);
+      pushSpotifyNowPlaying();
+      pushSpotifyNextTrack();
+    }, 4000);
   }, 1000);
 
 function isNonWorkingTime() {
