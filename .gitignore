@@ -1,12 +1,26 @@
+# Dependencies
 node_modules/
+
+# Build & Package Outputs
 dist/
+dist2/
+dist_build/
+*.exe
+*.nupkg
+RELEASES
+
+# Python Caches
 __pycache__/
 *.pyc
-.DS_Store
-*.log
-*.exe
-*.bak
-user-config.json
-widget-debug.log
-.env
 
+# Local User Data & Configs
+user-config.json
+spotify_token.json
+widget-debug.log
+*.log
+*.bak
+*.b64
+.env
+.DS_Store
+.claude/
+.vscode/
