@@ -887,33 +887,12 @@ function updateSpotifyUI(data) {
     spotifyArtist.title = data.artist || '';
     spotifyLastTrack = data.track + '|' + (data.artist || '');
     applyArtistTheme(data.artist);
-
-    // Smart marquee text scrolling for narrow window protection
-    setTimeout(() => {
-      if (spotifyTrack.scrollWidth > spotifyTrack.clientWidth + 2) {
-        const offset = spotifyTrack.scrollWidth - spotifyTrack.clientWidth + 16;
-        spotifyTrack.style.setProperty('--marquee-offset', `-${offset}px`);
-        spotifyTrack.classList.add('marquee-active');
-      } else {
-        spotifyTrack.classList.remove('marquee-active');
-      }
-
-      if (spotifyArtist.scrollWidth > spotifyArtist.clientWidth + 2) {
-        const offset = spotifyArtist.scrollWidth - spotifyArtist.clientWidth + 14;
-        spotifyArtist.style.setProperty('--marquee-offset', `-${offset}px`);
-        spotifyArtist.classList.add('marquee-active');
-      } else {
-        spotifyArtist.classList.remove('marquee-active');
-      }
-    }, 60);
   } else {
     spotifyTrack.textContent = 'Spotify';
     spotifyArtist.textContent = '';
     spotifyBar.title = 'Spotify';
     spotifyTrack.title = '';
     spotifyArtist.title = '';
-    spotifyTrack.classList.remove('marquee-active');
-    spotifyArtist.classList.remove('marquee-active');
     applyArtistTheme('');
   }
 

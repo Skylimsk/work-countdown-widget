@@ -275,12 +275,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
   transition: color var(--ease-slow);
-}
-.spotify-track.marquee-active, .spotify-bar:hover .spotify-track.marquee-active {
-  text-overflow: clip;
-  animation: spt-scroll 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
 .spotify-artist {
@@ -290,21 +285,7 @@ html, body {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  display: inline-block;
   transition: color var(--ease-slow);
-}
-.spotify-artist.marquee-active, .spotify-bar:hover .spotify-artist.marquee-active {
-  text-overflow: clip;
-  animation: spt-scroll 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  animation-delay: 0.6s;
-}
-
-@keyframes spt-scroll {
-  0%   { transform: translateX(0); }
-  15%  { transform: translateX(0); }
-  75%  { transform: translateX(var(--marquee-offset, -60px)); }
-  85%  { transform: translateX(var(--marquee-offset, -60px)); }
-  100% { transform: translateX(0); }
 }
 
 .spotify-controls { display: flex; gap: 1px; align-items: center; flex-shrink: 0; }
