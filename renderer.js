@@ -832,14 +832,78 @@ function setPlayIcon(playing) {
 }
 
 // Artist fan colors (應援色) — override the day-of-week accent for known artists
-const ARTIST_THEME_CLASSES = ['artist-twice', 'artist-ag5', 'artist-taylorswift', 'artist-mayday', 'artist-weibird'];
-function applyArtistTheme(artist) {
+const ARTIST_THEME_CLASSES = [
+  'artist-twice', 'artist-ag5', 'artist-taylorswift', 'artist-mayday', 'artist-weibird',
+  // TWICE members
+  'artist-nayeon', 'artist-jeongyeon', 'artist-momo', 'artist-sana',
+  'artist-jihyo', 'artist-mina', 'artist-dahyun', 'artist-chaeyoung', 'artist-tzuyu',
+  // TWICE sub-units
+  'artist-misamo', 'artist-taste'
+];
+
+// TWICE member detection — checks artist name AND track name
+function detectTwiceMember(artist, track) {
+  const a = (artist || '').toLowerCase();
+  const t = (track || '').toLowerCase();
+  const combined = a + ' ' + t;
+
+  // Sub-units first (higher priority than solo matches)
+  if (combined.includes('misamo')) return 'artist-misamo';
+  if (combined.includes('taste') && (a.includes('tzuyu') || a.includes('sana') || t.includes('tzuyu') || t.includes('sana'))) return 'artist-taste';
+
+  // Solo detection: artist name takes priority, fallback to track name
+  // Use strict word-boundary-style checks to avoid false matches
+
+  // Nayeon 娜琏 (also romanized Na-yeon)
+  if (a === 'nayeon' || a === '나연' || a.includes('nayeon') || t.includes('nayeon')) return 'artist-nayeon';
+
+  // Jeongyeon 定延
+  if (a === 'jeongyeon' || a === '정연' || a.includes('jeongyeon') || t.includes('jeongyeon')) return 'artist-jeongyeon';
+
+  // Momo — careful not to match 'moment' etc in track names
+  if (a === 'momo' || a === '모모' || a.includes('momo') || t === 'momo') return 'artist-momo';
+
+  // Sana
+  if (a === 'sana' || a === '사나' || a.includes('sana') || t === 'sana') return 'artist-sana';
+
+  // Jihyo 志效
+  if (a === 'jihyo' || a === '지효' || a.includes('jihyo') || t.includes('jihyo')) return 'artist-jihyo';
+
+  // Mina — careful with common English word 'mina'
+  if (a === 'mina' || a === '미나' || a.includes('mina') || t === 'mina') return 'artist-mina';
+
+  // Dahyun 多贤
+  if (a === 'dahyun' || a === '다현' || a.includes('dahyun') || t.includes('dahyun')) return 'artist-dahyun';
+
+  // Chaeyoung 彩瑛 (also Chae)
+  if (a === 'chaeyoung' || a === '채영' || a.includes('chaeyoung') || t.includes('chaeyoung')) return 'artist-chaeyoung';
+
+  // Tzuyu 子瑜
+  if (a === 'tzuyu' || a === '쯔위' || a.includes('tzuyu') || t.includes('tzuyu')) return 'artist-tzuyu';
+
+  return null;
+}
+
+function applyArtistTheme(artist, track) {
   const original = artist || '';
   const lower = original.toLowerCase();
   spotifyBar.classList.remove(...ARTIST_THEME_CLASSES);
+
+  // 1. Check for TWICE member / sub-unit first
+  const memberClass = detectTwiceMember(artist, track);
+  if (memberClass) {
+    spotifyBar.classList.add(memberClass);
+    return;
+  }
+
+  // 2. TWICE group (only if artist explicitly says TWICE)
   if (lower.includes('twice')) {
     spotifyBar.classList.add('artist-twice');
-  } else if (original.includes('告五人')) {
+    return;
+  }
+
+  // 3. Other artists
+  if (original.includes('告五人')) {
     spotifyBar.classList.add('artist-ag5');
   } else if (lower.includes('taylor swift')) {
     spotifyBar.classList.add('artist-taylorswift');
@@ -886,14 +950,14 @@ function updateSpotifyUI(data) {
     spotifyTrack.title = data.track;
     spotifyArtist.title = data.artist || '';
     spotifyLastTrack = data.track + '|' + (data.artist || '');
-    applyArtistTheme(data.artist);
+    applyArtistTheme(data.artist, data.track);
   } else {
     spotifyTrack.textContent = 'Spotify';
     spotifyArtist.textContent = '';
     spotifyBar.title = 'Spotify';
     spotifyTrack.title = '';
     spotifyArtist.title = '';
-    applyArtistTheme('');
+    applyArtistTheme('', '');
   }
 
   // Smooth position reconciliation

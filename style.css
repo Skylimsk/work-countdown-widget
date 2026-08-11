@@ -357,11 +357,131 @@ html, body {
 .spotify-device-empty { font-size: 9px; color: var(--text-3); padding: 3px 5px; }
 
 /* ─── Artist Fan Colors (應援色) — overrides the day-of-week accent for matched artists ─── */
+
+/* TWICE Group — Apricot × Neon Magenta gradient */
 .spotify-bar.artist-twice {
-  border-color: rgba(209,0,86,0.35);
-  box-shadow: 0 4px 14px rgba(209,0,86,0.22);
+  border-color: rgba(209,0,86,0.38);
+  box-shadow: 0 4px 18px rgba(209,0,86,0.25);
 }
-.spotify-bar.artist-twice .spotify-progress-fill { background: linear-gradient(90deg, #FFC067, #D10056); }
+.spotify-bar.artist-twice .spotify-progress-fill {
+  background: linear-gradient(90deg, #FFC067 0%, #FF6BA8 50%, #D10056 100%);
+}
+.spotify-bar.artist-twice .spotify-track { color: #FF6BA8; }
+
+/* ── TWICE Solo Members (應援色) ── */
+
+/* Nayeon 娜琏 — Sky Blue #A2DAE2 */
+.spotify-bar.artist-nayeon {
+  border-color: rgba(162,218,226,0.45);
+  box-shadow: 0 4px 18px rgba(162,218,226,0.28);
+}
+.spotify-bar.artist-nayeon .spotify-progress-fill {
+  background: linear-gradient(90deg, #7FCAD4, #A2DAE2);
+}
+.spotify-bar.artist-nayeon .spotify-track { color: #A2DAE2; }
+
+/* Jeongyeon 定延 — Yellow Green #C8DF52 */
+.spotify-bar.artist-jeongyeon {
+  border-color: rgba(200,223,82,0.45);
+  box-shadow: 0 4px 18px rgba(200,223,82,0.25);
+}
+.spotify-bar.artist-jeongyeon .spotify-progress-fill {
+  background: linear-gradient(90deg, #A8C430, #C8DF52);
+}
+.spotify-bar.artist-jeongyeon .spotify-track { color: #C8DF52; }
+
+/* Momo — Pink #F27A8F */
+.spotify-bar.artist-momo {
+  border-color: rgba(242,122,143,0.45);
+  box-shadow: 0 4px 18px rgba(242,122,143,0.28);
+}
+.spotify-bar.artist-momo .spotify-progress-fill {
+  background: linear-gradient(90deg, #E84D6C, #F27A8F);
+}
+.spotify-bar.artist-momo .spotify-track { color: #F27A8F; }
+
+/* Sana — Purple/Violet #915DA3 */
+.spotify-bar.artist-sana {
+  border-color: rgba(145,93,163,0.48);
+  box-shadow: 0 4px 18px rgba(145,93,163,0.30);
+}
+.spotify-bar.artist-sana .spotify-progress-fill {
+  background: linear-gradient(90deg, #6A3A84, #915DA3, #C08FD4);
+}
+.spotify-bar.artist-sana .spotify-track { color: #C08FD4; }
+
+/* Jihyo 志效 — Apricot/Yellow #FBCB2B */
+.spotify-bar.artist-jihyo {
+  border-color: rgba(251,203,43,0.45);
+  box-shadow: 0 4px 18px rgba(251,203,43,0.28);
+}
+.spotify-bar.artist-jihyo .spotify-progress-fill {
+  background: linear-gradient(90deg, #F0A800, #FBCB2B, #FFE57A);
+}
+.spotify-bar.artist-jihyo .spotify-track { color: #FBCB2B; }
+
+/* Mina — Mint #4EC0A8 */
+.spotify-bar.artist-mina {
+  border-color: rgba(78,192,168,0.45);
+  box-shadow: 0 4px 18px rgba(78,192,168,0.28);
+}
+.spotify-bar.artist-mina .spotify-progress-fill {
+  background: linear-gradient(90deg, #2EA080, #4EC0A8, #8DE8D4);
+}
+.spotify-bar.artist-mina .spotify-track { color: #4EC0A8; }
+
+/* Dahyun 多贤 — White #FFFFFF */
+.spotify-bar.artist-dahyun {
+  border-color: rgba(255,255,255,0.40);
+  box-shadow: 0 4px 18px rgba(255,255,255,0.18);
+}
+.spotify-bar.artist-dahyun .spotify-progress-fill {
+  background: linear-gradient(90deg, rgba(200,200,200,0.8), rgba(255,255,255,0.95));
+}
+.spotify-bar.artist-dahyun .spotify-track { color: #F0F0F0; }
+
+/* Chaeyoung 彩瑛 — Red #E2231A */
+.spotify-bar.artist-chaeyoung {
+  border-color: rgba(226,35,26,0.45);
+  box-shadow: 0 4px 18px rgba(226,35,26,0.30);
+}
+.spotify-bar.artist-chaeyoung .spotify-progress-fill {
+  background: linear-gradient(90deg, #B01010, #E2231A, #FF6055);
+}
+.spotify-bar.artist-chaeyoung .spotify-track { color: #FF6055; }
+
+/* Tzuyu 子瑜 — Navy Blue #1D2088 */
+.spotify-bar.artist-tzuyu {
+  border-color: rgba(29,32,136,0.60);
+  box-shadow: 0 4px 18px rgba(80,90,220,0.32);
+}
+.spotify-bar.artist-tzuyu .spotify-progress-fill {
+  background: linear-gradient(90deg, #1D2088, #4A54D0, #8892FF);
+}
+.spotify-bar.artist-tzuyu .spotify-track { color: #8892FF; }
+
+/* ── TWICE Sub-units ── */
+
+/* MISAMO (Mina + Sana + Momo) — tri-color gradient */
+.spotify-bar.artist-misamo {
+  border-color: rgba(162,100,200,0.42);
+  box-shadow: 0 4px 18px rgba(162,100,200,0.26);
+}
+.spotify-bar.artist-misamo .spotify-progress-fill {
+  background: linear-gradient(90deg, #4EC0A8, #915DA3, #F27A8F);
+}
+.spotify-bar.artist-misamo .spotify-track { color: #C08FD4; }
+
+/* TASTE (Tzuyu + Sana) */
+.spotify-bar.artist-taste {
+  border-color: rgba(100,120,210,0.45);
+  box-shadow: 0 4px 18px rgba(100,120,210,0.26);
+}
+.spotify-bar.artist-taste .spotify-progress-fill {
+  background: linear-gradient(90deg, #1D2088, #8892FF, #C08FD4, #915DA3);
+}
+.spotify-bar.artist-taste .spotify-track { color: #9AA8FF; }
+
 
 .spotify-bar.artist-ag5 {
   border-color: rgba(143,227,136,0.4);
