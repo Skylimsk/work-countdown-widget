@@ -793,6 +793,10 @@ refreshQuota();
 const spotifyBar          = document.getElementById('spotifyBar');
 const spotifyTrack        = document.getElementById('spotifyTrack');
 const spotifyArtist       = document.getElementById('spotifyArtist');
+const spotifyRollcallName = document.getElementById('spotifyRollcallName');
+const fireworksLayer      = document.getElementById('fireworksLayer');
+const confettiLayer       = document.getElementById('confettiLayer');
+const christmasLayer      = document.getElementById('christmasLayer');
 const btnSpotifyPlay      = document.getElementById('btnSpotifyPlay');
 const btnSpotifyNext      = document.getElementById('btnSpotifyNext');
 const btnSpotifyPrev      = document.getElementById('btnSpotifyPrev');
@@ -838,7 +842,9 @@ const ARTIST_THEME_CLASSES = [
   'artist-nayeon', 'artist-jeongyeon', 'artist-momo', 'artist-sana',
   'artist-jihyo', 'artist-mina', 'artist-dahyun', 'artist-chaeyoung', 'artist-tzuyu',
   // TWICE sub-units
-  'artist-misamo', 'artist-taste'
+  'artist-misamo', 'artist-taste',
+  // Candy Bong glow animation + Feel Special rollcall
+  'candy-bong-active', 'feel-special-rollcall'
 ];
 
 // TWICE member detection — checks artist name AND track name
@@ -893,16 +899,19 @@ function applyArtistTheme(artist, track) {
   const memberClass = detectTwiceMember(artist, track);
   if (memberClass) {
     spotifyBar.classList.add(memberClass);
+    spotifyBar.classList.add('candy-bong-active'); // 🕯️ Candy Bong breathing glow!
     return;
   }
 
   // 2. TWICE group (only if artist explicitly says TWICE)
   if (lower.includes('twice')) {
     spotifyBar.classList.add('artist-twice');
+    spotifyBar.classList.add('candy-bong-active'); // 🕯️ Candy Bong breathing glow!
     return;
   }
 
-  // 3. Other artists
+  // 3. Other artists — no candy bong
+  spotifyBar.classList.remove('candy-bong-active');
   if (original.includes('告五人')) {
     spotifyBar.classList.add('artist-ag5');
   } else if (lower.includes('taylor swift')) {
@@ -911,6 +920,220 @@ function applyArtistTheme(artist, track) {
     spotifyBar.classList.add('artist-mayday');
   } else if (original.includes('韦礼安') || original.includes('韋禮安') || lower.includes('weibird')) {
     spotifyBar.classList.add('artist-weibird');
+  }
+}
+
+// ── Feel Special Outro Name Roll Call (3:06 ~ 3:16, 10s total) ───────────
+// Korean → Momo-chan! Sana-chan! Mina-chan! (direct, no jang beats) → Korean
+// Segments are contiguous (each end === next start) so there's never a gap
+// where the wrong color (or a color-less flash) could show. Reverts to
+// normal TWICE candy bong the instant position >= 196 (3:16).
+const FEEL_SPECIAL_ROLLCALL = [
+  { member: 'Im Nayeon',      start: 186, end: 187, rgb: '162, 218, 226' },
+  { member: 'Yoo Jeongyeon',  start: 187, end: 188, rgb: '200, 223, 82'  },
+  { member: 'Momo Chan',      start: 188, end: 189, rgb: '242, 122, 143' }, // Momo-chan 🩷
+  { member: 'Sana Chan',      start: 189, end: 190, rgb: '145, 93, 163'  }, // Sana-chan 💜
+  { member: 'Park Jihyo',     start: 190, end: 191, rgb: '251, 203, 43'  },
+  { member: 'Mina Chan',      start: 191, end: 192, rgb: '78, 192, 168'  }, // Mina-chan 🩵
+  { member: 'Kim Dahyun',     start: 192, end: 193, rgb: '220, 230, 235' },
+  { member: 'Son Chaeyoung',  start: 193, end: 194, rgb: '226, 35, 26'   },
+  { member: 'Chou Tzuyu',     start: 194, end: 196, rgb: '100, 120, 240' },
+];
+
+function checkFeelSpecialRollcall(trackName, artistName, positionSec) {
+  const t = (trackName || '').toLowerCase();
+  const a = (artistName || '').toLowerCase();
+  if (!t.includes('feel special') || !a.includes('twice')) {
+    // Not Feel Special — remove rollcall class if it was active
+    if (spotifyBar.classList.contains('feel-special-rollcall')) {
+      spotifyBar.classList.remove('feel-special-rollcall');
+      spotifyBar.style.removeProperty('--glow-rgb');
+      spotifyRollcallName.classList.remove('active');
+    }
+    return false;
+  }
+
+  const seg = FEEL_SPECIAL_ROLLCALL.find(s => positionSec >= s.start && positionSec < s.end);
+  if (seg) {
+    spotifyBar.classList.remove('candy-bong-active');
+    spotifyBar.classList.add('feel-special-rollcall');
+    spotifyBar.style.setProperty('--glow-rgb', seg.rgb);
+    // Show the member's name alongside the breathing glow — colors alone
+    // aren't always easy to tell apart at a glance.
+    spotifyRollcallName.textContent = seg.member;
+    spotifyRollcallName.classList.add('active');
+    return true;
+  } else {
+    // Outside rollcall window — restore normal candy bong
+    if (spotifyBar.classList.contains('feel-special-rollcall')) {
+      spotifyBar.classList.remove('feel-special-rollcall');
+      spotifyBar.style.removeProperty('--glow-rgb');
+      spotifyBar.classList.add('candy-bong-active');
+      spotifyRollcallName.classList.remove('active');
+    }
+    return false;
+  }
+}
+
+// ── One Spark Fireworks (2:34 ~ 3:03) ────────────────────────────────────
+// Layers a burst of sparks on top of the normal TWICE candy bong glow —
+// no member colors here, just fireworks for the song's climax.
+const ONE_SPARK_START = 154; // 2:34
+const ONE_SPARK_END   = 183; // 3:03
+const FIREWORK_COLORS = ['#FFD966', '#FF6FA5', '#7FE7FF', '#C6FF6B', '#FFFFFF', '#B98CFF'];
+let fireworksSpawnTimer = null;
+
+function spawnFireworkBurst() {
+  const originX = 15 + Math.random() * 70; // % across the bar
+  const originY = 20 + Math.random() * 55;
+  const count = 8 + Math.floor(Math.random() * 5);
+  for (let i = 0; i < count; i++) {
+    const spark = document.createElement('span');
+    spark.className = 'spark';
+    const angle = Math.random() * Math.PI * 2;
+    const dist = 14 + Math.random() * 22;
+    spark.style.setProperty('--x', originX + '%');
+    spark.style.setProperty('--y', originY + '%');
+    spark.style.setProperty('--dx', (Math.cos(angle) * dist) + 'px');
+    spark.style.setProperty('--dy', (Math.sin(angle) * dist) + 'px');
+    spark.style.setProperty('--spark-color', FIREWORK_COLORS[Math.floor(Math.random() * FIREWORK_COLORS.length)]);
+    spark.style.animationDelay = (Math.random() * 0.08) + 's';
+    fireworksLayer.appendChild(spark);
+    spark.addEventListener('animationend', () => spark.remove());
+    setTimeout(() => spark.remove(), 1200); // fallback in case animationend is missed
+  }
+}
+
+function stopFireworks() {
+  if (fireworksSpawnTimer) {
+    clearInterval(fireworksSpawnTimer);
+    fireworksSpawnTimer = null;
+  }
+  spotifyBar.classList.remove('fireworks-active');
+  fireworksLayer.innerHTML = '';
+}
+
+function checkOneSparkFireworks(trackName, artistName, positionSec) {
+  const t = (trackName || '').toLowerCase();
+  const a = (artistName || '').toLowerCase();
+  const inWindow = t.includes('one spark') && a.includes('twice') &&
+    positionSec >= ONE_SPARK_START && positionSec < ONE_SPARK_END;
+
+  if (inWindow) {
+    if (!fireworksSpawnTimer) {
+      spotifyBar.classList.add('fireworks-active');
+      spawnFireworkBurst();
+      fireworksSpawnTimer = setInterval(spawnFireworkBurst, 380);
+    }
+  } else if (fireworksSpawnTimer) {
+    stopFireworks();
+  }
+}
+
+// ── MISAMO Confetti (1:30~1:41, 2:10~2:19) ───────────────────────────────
+// Paper pieces fall through the bar on top of the normal MISAMO glow.
+const CONFETTI_WINDOWS = [
+  { start: 90,  end: 101 }, // 1:30 - 1:41
+  { start: 130, end: 139 }, // 2:10 - 2:19
+];
+const CONFETTI_COLORS = ['#4EC0A8', '#915DA3', '#F27A8F', '#FFFFFF', '#FFD966'];
+let confettiSpawnTimer = null;
+
+function spawnConfettiPiece() {
+  const piece = document.createElement('span');
+  piece.className = 'confetti-piece';
+  const rotStart = Math.random() * 360;
+  const rotEnd = rotStart + 200 + Math.random() * 240;
+  piece.style.setProperty('--cx', (Math.random() * 100) + '%');
+  piece.style.setProperty('--confetti-color', CONFETTI_COLORS[Math.floor(Math.random() * CONFETTI_COLORS.length)]);
+  piece.style.setProperty('--rot-start', rotStart + 'deg');
+  piece.style.setProperty('--rot-end', rotEnd + 'deg');
+  piece.style.setProperty('--drift', ((Math.random() * 40) - 20) + 'px');
+  piece.style.setProperty('--fall-dur', (0.9 + Math.random() * 0.5) + 's');
+  confettiLayer.appendChild(piece);
+  piece.addEventListener('animationend', () => piece.remove());
+  setTimeout(() => piece.remove(), 1700); // fallback in case animationend is missed
+}
+
+function spawnConfettiBurst() {
+  const count = 4 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < count; i++) spawnConfettiPiece();
+}
+
+function stopConfetti() {
+  if (confettiSpawnTimer) {
+    clearInterval(confettiSpawnTimer);
+    confettiSpawnTimer = null;
+  }
+  confettiLayer.innerHTML = '';
+}
+
+function checkMisamoConfetti(trackName, artistName, positionSec) {
+  const t = (trackName || '').toLowerCase();
+  const a = (artistName || '').toLowerCase();
+  const inWindow = t.includes('confetti') && a.includes('misamo') &&
+    CONFETTI_WINDOWS.some(w => positionSec >= w.start && positionSec < w.end);
+
+  if (inWindow) {
+    if (!confettiSpawnTimer) {
+      spawnConfettiBurst();
+      confettiSpawnTimer = setInterval(spawnConfettiBurst, 220);
+    }
+  } else if (confettiSpawnTimer) {
+    stopConfetti();
+  }
+}
+
+// ── Merry & Happy Christmas Atmosphere (whole song) ──────────────────────
+// Falling snow + a twinkling red/green/gold light string, layered on top of
+// the normal TWICE glow for the entire track (not a specific timestamp).
+// Elements are built once and loop via CSS instead of being re-spawned on
+// every tick, since this can run for the whole song length.
+const TWINKLE_COLORS = ['#ff4d4d', '#3ecf6b', '#ffd54a'];
+let christmasActive = false;
+
+function startChristmasEffect() {
+  if (christmasActive) return;
+  christmasActive = true;
+
+  for (let i = 0; i < 10; i++) {
+    const flake = document.createElement('span');
+    flake.className = 'snowflake';
+    flake.style.setProperty('--sx', (Math.random() * 100) + '%');
+    flake.style.setProperty('--snow-size', (2 + Math.random() * 2.5) + 'px');
+    flake.style.setProperty('--snow-dur', (3 + Math.random() * 2.5) + 's');
+    flake.style.setProperty('--snow-delay', (Math.random() * 4) + 's');
+    flake.style.setProperty('--snow-drift', ((Math.random() * 30) - 15) + 'px');
+    christmasLayer.appendChild(flake);
+  }
+
+  for (let i = 0; i < 8; i++) {
+    const light = document.createElement('span');
+    light.className = 'twinkle-light';
+    light.style.setProperty('--tx-x', (4 + (i * 92 / 7)) + '%');
+    light.style.setProperty('--tx-y', (Math.random() * 12) + '%');
+    light.style.setProperty('--twinkle-color', TWINKLE_COLORS[i % TWINKLE_COLORS.length]);
+    light.style.setProperty('--twinkle-dur', (1 + Math.random() * 1) + 's');
+    light.style.setProperty('--twinkle-delay', (Math.random() * 1.5) + 's');
+    christmasLayer.appendChild(light);
+  }
+}
+
+function stopChristmasEffect() {
+  if (!christmasActive) return;
+  christmasActive = false;
+  christmasLayer.innerHTML = '';
+}
+
+function checkMerryHappyChristmas(trackName, artistName) {
+  const t = (trackName || '').toLowerCase();
+  const a = (artistName || '').toLowerCase();
+  const isMerryHappy = t.includes('merry') && t.includes('happy') && a.includes('twice');
+
+  if (isMerryHappy) {
+    startChristmasEffect();
+  } else {
+    stopChristmasEffect();
   }
 }
 
@@ -923,6 +1146,11 @@ function tickSmoothProgress() {
 
     spotifyProgressFill.style.width = `${pct}%`;
     spotifyTimeText.textContent = `${formatSecs(estPos)} / ${formatSecs(currentDurSec)}`;
+
+    // 🎀 Feel Special outro name roll call — light up each member's color!
+    checkFeelSpecialRollcall(spotifyTrack.textContent, spotifyArtist.textContent, estPos);
+    checkOneSparkFireworks(spotifyTrack.textContent, spotifyArtist.textContent, estPos);
+    checkMisamoConfetti(spotifyTrack.textContent, spotifyArtist.textContent, estPos);
   } else {
     spotifyProgressFill.style.width = '0%';
     spotifyTimeText.textContent = '0:00 / 0:00';
@@ -934,6 +1162,9 @@ function updateSpotifyUI(data) {
     spotifyBar.style.display = 'none';
     if (progressTickTimer) clearInterval(progressTickTimer);
     progressTickTimer = null;
+    stopFireworks();
+    stopConfetti();
+    stopChristmasEffect();
     return;
   }
   spotifyBar.style.display = 'flex';
@@ -951,6 +1182,7 @@ function updateSpotifyUI(data) {
     spotifyArtist.title = data.artist || '';
     spotifyLastTrack = data.track + '|' + (data.artist || '');
     applyArtistTheme(data.artist, data.track);
+    checkMerryHappyChristmas(data.track, data.artist);
   } else {
     spotifyTrack.textContent = 'Spotify';
     spotifyArtist.textContent = '';
@@ -958,6 +1190,7 @@ function updateSpotifyUI(data) {
     spotifyTrack.title = '';
     spotifyArtist.title = '';
     applyArtistTheme('', '');
+    checkMerryHappyChristmas('', '');
   }
 
   // Smooth position reconciliation
@@ -999,7 +1232,9 @@ function updateSpotifyUI(data) {
     }
     if (!progressTickTimer) {
       tickSmoothProgress();
-      progressTickTimer = setInterval(tickSmoothProgress, 1000);
+      // 200ms resolution — 1000ms was too coarse for the 1s-wide rollcall
+      // windows and would occasionally skip a member's color entirely.
+      progressTickTimer = setInterval(tickSmoothProgress, 200);
     }
   }
 

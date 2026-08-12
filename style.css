@@ -358,130 +358,307 @@ html, body {
 
 /* ─── Artist Fan Colors (應援色) — overrides the day-of-week accent for matched artists ─── */
 
-/* TWICE Group — Apricot × Neon Magenta gradient */
+/* ── Candy Bong Breathing Pulse Animation (荧光棒呼吸脉冲) ── */
+@keyframes candy-bong-pulse {
+  0%   {
+    box-shadow:
+      0 0 3px  2px  rgba(var(--glow-rgb), 0.20),
+      0 0 10px 4px  rgba(var(--glow-rgb), 0.10),
+      0 0 16px 6px  rgba(var(--glow-rgb), 0.05);
+    border-color: rgba(var(--glow-rgb), 0.30);
+  }
+  50%  {
+    box-shadow:
+      0 0 8px  4px  rgba(var(--glow-rgb), 0.42),
+      0 0 20px 10px rgba(var(--glow-rgb), 0.24),
+      0 0 38px 18px rgba(var(--glow-rgb), 0.11),
+      0 0 58px 28px rgba(var(--glow-rgb), 0.05);
+    border-color: rgba(var(--glow-rgb), 0.52);
+  }
+  100% {
+    box-shadow:
+      0 0 3px  2px  rgba(var(--glow-rgb), 0.20),
+      0 0 10px 4px  rgba(var(--glow-rgb), 0.10),
+      0 0 16px 6px  rgba(var(--glow-rgb), 0.05);
+    border-color: rgba(var(--glow-rgb), 0.30);
+  }
+}
+
+/* Class added by JS when TWICE/member track is detected */
+.spotify-bar.candy-bong-active {
+  animation: candy-bong-pulse 3s ease-in-out infinite;
+  transition: border-color 0s;
+}
+
+/* ── TWICE Group — Apricot × Neon Magenta ── */
 .spotify-bar.artist-twice {
-  border-color: rgba(209,0,86,0.38);
-  box-shadow: 0 4px 18px rgba(209,0,86,0.25);
+  --glow-rgb: 255, 107, 168;
+  border-color: rgba(255,107,168,0.40);
+  box-shadow: 0 0 8px 3px rgba(255,107,168,0.28), 0 0 20px 7px rgba(255,107,168,0.13);
 }
 .spotify-bar.artist-twice .spotify-progress-fill {
   background: linear-gradient(90deg, #FFC067 0%, #FF6BA8 50%, #D10056 100%);
 }
 .spotify-bar.artist-twice .spotify-track { color: #FF6BA8; }
 
-/* ── TWICE Solo Members (應援色) ── */
+/* ── TWICE Solo Members ── */
 
-/* Nayeon 娜琏 — Sky Blue #A2DAE2 */
+/* Nayeon 娜琏 — Sky Blue */
 .spotify-bar.artist-nayeon {
-  border-color: rgba(162,218,226,0.45);
-  box-shadow: 0 4px 18px rgba(162,218,226,0.28);
+  --glow-rgb: 162, 218, 226;
+  border-color: rgba(162,218,226,0.42);
+  box-shadow: 0 0 8px 3px rgba(162,218,226,0.28), 0 0 20px 7px rgba(162,218,226,0.13);
 }
-.spotify-bar.artist-nayeon .spotify-progress-fill {
-  background: linear-gradient(90deg, #7FCAD4, #A2DAE2);
-}
+.spotify-bar.artist-nayeon .spotify-progress-fill { background: linear-gradient(90deg, #7FCAD4, #A2DAE2); }
 .spotify-bar.artist-nayeon .spotify-track { color: #A2DAE2; }
 
-/* Jeongyeon 定延 — Yellow Green #C8DF52 */
+/* Jeongyeon 定延 — Yellow Green */
 .spotify-bar.artist-jeongyeon {
-  border-color: rgba(200,223,82,0.45);
-  box-shadow: 0 4px 18px rgba(200,223,82,0.25);
+  --glow-rgb: 200, 223, 82;
+  border-color: rgba(200,223,82,0.42);
+  box-shadow: 0 0 8px 3px rgba(200,223,82,0.28), 0 0 20px 7px rgba(200,223,82,0.13);
 }
-.spotify-bar.artist-jeongyeon .spotify-progress-fill {
-  background: linear-gradient(90deg, #A8C430, #C8DF52);
-}
+.spotify-bar.artist-jeongyeon .spotify-progress-fill { background: linear-gradient(90deg, #A8C430, #C8DF52); }
 .spotify-bar.artist-jeongyeon .spotify-track { color: #C8DF52; }
 
-/* Momo — Pink #F27A8F */
+/* Momo — Pink */
 .spotify-bar.artist-momo {
-  border-color: rgba(242,122,143,0.45);
-  box-shadow: 0 4px 18px rgba(242,122,143,0.28);
+  --glow-rgb: 242, 122, 143;
+  border-color: rgba(242,122,143,0.42);
+  box-shadow: 0 0 8px 3px rgba(242,122,143,0.28), 0 0 20px 7px rgba(242,122,143,0.13);
 }
-.spotify-bar.artist-momo .spotify-progress-fill {
-  background: linear-gradient(90deg, #E84D6C, #F27A8F);
-}
+.spotify-bar.artist-momo .spotify-progress-fill { background: linear-gradient(90deg, #E84D6C, #F27A8F); }
 .spotify-bar.artist-momo .spotify-track { color: #F27A8F; }
 
-/* Sana — Purple/Violet #915DA3 */
+/* Sana — Purple/Violet */
 .spotify-bar.artist-sana {
-  border-color: rgba(145,93,163,0.48);
-  box-shadow: 0 4px 18px rgba(145,93,163,0.30);
+  --glow-rgb: 192, 143, 212;
+  border-color: rgba(145,93,163,0.45);
+  box-shadow: 0 0 8px 3px rgba(145,93,163,0.32), 0 0 20px 7px rgba(145,93,163,0.15);
 }
-.spotify-bar.artist-sana .spotify-progress-fill {
-  background: linear-gradient(90deg, #6A3A84, #915DA3, #C08FD4);
-}
+.spotify-bar.artist-sana .spotify-progress-fill { background: linear-gradient(90deg, #6A3A84, #915DA3, #C08FD4); }
 .spotify-bar.artist-sana .spotify-track { color: #C08FD4; }
 
-/* Jihyo 志效 — Apricot/Yellow #FBCB2B */
+/* Jihyo 志效 — Apricot/Yellow */
 .spotify-bar.artist-jihyo {
-  border-color: rgba(251,203,43,0.45);
-  box-shadow: 0 4px 18px rgba(251,203,43,0.28);
+  --glow-rgb: 251, 203, 43;
+  border-color: rgba(251,203,43,0.42);
+  box-shadow: 0 0 8px 3px rgba(251,203,43,0.28), 0 0 20px 7px rgba(251,203,43,0.13);
 }
-.spotify-bar.artist-jihyo .spotify-progress-fill {
-  background: linear-gradient(90deg, #F0A800, #FBCB2B, #FFE57A);
-}
+.spotify-bar.artist-jihyo .spotify-progress-fill { background: linear-gradient(90deg, #F0A800, #FBCB2B, #FFE57A); }
 .spotify-bar.artist-jihyo .spotify-track { color: #FBCB2B; }
 
-/* Mina — Mint #4EC0A8 */
+/* Mina — Mint */
 .spotify-bar.artist-mina {
-  border-color: rgba(78,192,168,0.45);
-  box-shadow: 0 4px 18px rgba(78,192,168,0.28);
+  --glow-rgb: 78, 192, 168;
+  border-color: rgba(78,192,168,0.42);
+  box-shadow: 0 0 8px 3px rgba(78,192,168,0.28), 0 0 20px 7px rgba(78,192,168,0.13);
 }
-.spotify-bar.artist-mina .spotify-progress-fill {
-  background: linear-gradient(90deg, #2EA080, #4EC0A8, #8DE8D4);
-}
+.spotify-bar.artist-mina .spotify-progress-fill { background: linear-gradient(90deg, #2EA080, #4EC0A8, #8DE8D4); }
 .spotify-bar.artist-mina .spotify-track { color: #4EC0A8; }
 
-/* Dahyun 多贤 — White #FFFFFF */
+/* Dahyun 多贤 — White */
 .spotify-bar.artist-dahyun {
-  border-color: rgba(255,255,255,0.40);
-  box-shadow: 0 4px 18px rgba(255,255,255,0.18);
+  --glow-rgb: 220, 230, 235;
+  border-color: rgba(255,255,255,0.38);
+  box-shadow: 0 0 8px 3px rgba(220,230,235,0.30), 0 0 20px 7px rgba(220,230,235,0.14);
 }
-.spotify-bar.artist-dahyun .spotify-progress-fill {
-  background: linear-gradient(90deg, rgba(200,200,200,0.8), rgba(255,255,255,0.95));
-}
+.spotify-bar.artist-dahyun .spotify-progress-fill { background: linear-gradient(90deg, rgba(200,200,200,0.85), rgba(255,255,255,0.98)); }
 .spotify-bar.artist-dahyun .spotify-track { color: #F0F0F0; }
 
-/* Chaeyoung 彩瑛 — Red #E2231A */
+/* Chaeyoung 彩瑛 — Red */
 .spotify-bar.artist-chaeyoung {
-  border-color: rgba(226,35,26,0.45);
-  box-shadow: 0 4px 18px rgba(226,35,26,0.30);
+  --glow-rgb: 226, 35, 26;
+  border-color: rgba(226,35,26,0.42);
+  box-shadow: 0 0 8px 3px rgba(226,35,26,0.30), 0 0 20px 7px rgba(226,35,26,0.15);
 }
-.spotify-bar.artist-chaeyoung .spotify-progress-fill {
-  background: linear-gradient(90deg, #B01010, #E2231A, #FF6055);
-}
+.spotify-bar.artist-chaeyoung .spotify-progress-fill { background: linear-gradient(90deg, #B01010, #E2231A, #FF6055); }
 .spotify-bar.artist-chaeyoung .spotify-track { color: #FF6055; }
 
-/* Tzuyu 子瑜 — Navy Blue #1D2088 */
+/* Tzuyu 子瑜 — Navy Blue */
 .spotify-bar.artist-tzuyu {
-  border-color: rgba(29,32,136,0.60);
-  box-shadow: 0 4px 18px rgba(80,90,220,0.32);
+  --glow-rgb: 100, 120, 240;
+  border-color: rgba(29,32,136,0.52);
+  box-shadow: 0 0 8px 3px rgba(80,90,220,0.32), 0 0 20px 7px rgba(80,90,220,0.16);
 }
-.spotify-bar.artist-tzuyu .spotify-progress-fill {
-  background: linear-gradient(90deg, #1D2088, #4A54D0, #8892FF);
-}
+.spotify-bar.artist-tzuyu .spotify-progress-fill { background: linear-gradient(90deg, #1D2088, #4A54D0, #8892FF); }
 .spotify-bar.artist-tzuyu .spotify-track { color: #8892FF; }
 
 /* ── TWICE Sub-units ── */
 
-/* MISAMO (Mina + Sana + Momo) — tri-color gradient */
+/* MISAMO — Mina(Mint) + Sana(Purple) + Momo(Pink) */
 .spotify-bar.artist-misamo {
-  border-color: rgba(162,100,200,0.42);
-  box-shadow: 0 4px 18px rgba(162,100,200,0.26);
+  --glow-rgb: 192, 143, 212;
+  border-color: rgba(145,93,163,0.42);
+  box-shadow: 0 0 8px 3px rgba(162,100,200,0.28), 0 0 20px 7px rgba(162,100,200,0.13);
 }
-.spotify-bar.artist-misamo .spotify-progress-fill {
-  background: linear-gradient(90deg, #4EC0A8, #915DA3, #F27A8F);
-}
+.spotify-bar.artist-misamo .spotify-progress-fill { background: linear-gradient(90deg, #4EC0A8, #915DA3, #F27A8F); }
 .spotify-bar.artist-misamo .spotify-track { color: #C08FD4; }
 
-/* TASTE (Tzuyu + Sana) */
+/* TASTE — Tzuyu + Sana */
 .spotify-bar.artist-taste {
-  border-color: rgba(100,120,210,0.45);
-  box-shadow: 0 4px 18px rgba(100,120,210,0.26);
+  --glow-rgb: 154, 168, 255;
+  border-color: rgba(100,120,210,0.42);
+  box-shadow: 0 0 8px 3px rgba(100,120,210,0.28), 0 0 20px 7px rgba(100,120,210,0.13);
 }
-.spotify-bar.artist-taste .spotify-progress-fill {
-  background: linear-gradient(90deg, #1D2088, #8892FF, #C08FD4, #915DA3);
-}
+.spotify-bar.artist-taste .spotify-progress-fill { background: linear-gradient(90deg, #1D2088, #8892FF, #C08FD4, #915DA3); }
 .spotify-bar.artist-taste .spotify-track { color: #9AA8FF; }
 
+/* ── Feel Special Roll Call — sequential member color flash ── */
+/* Applied via JS inline style: spotifyBar.style.setProperty('--glow-rgb', 'R, G, B') */
+.spotify-bar.feel-special-rollcall {
+  animation: candy-bong-pulse 0.6s ease-in-out infinite !important;
+  transition: --glow-rgb 0.15s ease;
+}
+
+/* Member name badge — shown alongside the breathing glow so you don't have
+   to tell the members apart by color alone. Text content + visibility are
+   driven by JS in checkFeelSpecialRollcall(). */
+.spotify-rollcall-name {
+  position: absolute;
+  top: -11px;
+  left: 50%;
+  max-width: calc(100% - 16px);
+  padding: 2px 10px;
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  border-radius: 8px;
+  background: rgba(var(--glow-rgb), 0.92);
+  color: #14151a;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.25);
+  box-shadow: 0 2px 8px rgba(var(--glow-rgb), 0.45), 0 0 0 1px rgba(255,255,255,0.15);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  opacity: 0;
+  transform: translateX(-50%) translateY(2px) scale(0.92);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+  z-index: 5;
+}
+.spotify-bar.feel-special-rollcall .spotify-rollcall-name.active {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+/* ── One Spark Fireworks (2:34 ~ 3:03) — sparks burst on top of the bar ── */
+.fireworks-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+}
+.spark {
+  position: absolute;
+  left: var(--x, 50%);
+  top: var(--y, 50%);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--spark-color, #fff);
+  box-shadow: 0 0 5px 1.5px var(--spark-color, #fff);
+  opacity: 0;
+  animation: spark-burst 0.85s ease-out forwards;
+}
+@keyframes spark-burst {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 1; }
+  65%  { opacity: 1; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0.1); opacity: 0; }
+}
+/* Subtle warm flicker behind the sparks — a separate overlay (not the bar's
+   own box-shadow) so it layers on top of candy-bong-pulse instead of
+   fighting it for the same animated property. */
+.fireworks-layer::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 214, 102, 0.28), transparent 70%);
+  opacity: 0;
+}
+.spotify-bar.fireworks-active .fireworks-layer::before {
+  animation: fireworks-flicker 0.9s ease-in-out infinite;
+}
+@keyframes fireworks-flicker {
+  0%, 100% { opacity: 0; }
+  50%      { opacity: 1; }
+}
+
+/* ── MISAMO Confetti (2:10 ~ 2:19) — paper pieces falling through the bar ── */
+.confetti-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+}
+.confetti-piece {
+  position: absolute;
+  top: -10%;
+  left: var(--cx, 50%);
+  width: 5px;
+  height: 8px;
+  background: var(--confetti-color, #fff);
+  opacity: 0.95;
+  animation: confetti-fall var(--fall-dur, 1.1s) linear forwards;
+}
+@keyframes confetti-fall {
+  0%   { transform: translateY(0) translateX(0) rotate(var(--rot-start, 0deg)); opacity: 1; }
+  100% { transform: translateY(140px) translateX(var(--drift, 10px)) rotate(var(--rot-end, 260deg)); opacity: 0; }
+}
+
+/* ── Merry & Happy Christmas Atmosphere (whole song) ── */
+/* Slow falling snow + a twinkling string of red/green/gold lights. Elements
+   are created once when the track starts and loop via CSS (animation:
+   infinite) rather than being spawned repeatedly, since this runs for the
+   full song length. */
+.christmas-layer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 4;
+}
+.snowflake {
+  position: absolute;
+  top: 0;
+  left: var(--sx, 50%);
+  width: var(--snow-size, 3px);
+  height: var(--snow-size, 3px);
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 3px 1px rgba(255,255,255,0.75);
+  opacity: 0;
+  animation: snow-fall var(--snow-dur, 4s) linear infinite;
+  animation-delay: var(--snow-delay, 0s);
+}
+@keyframes snow-fall {
+  0%   { transform: translateY(-12px) translateX(0); opacity: 0; }
+  10%  { opacity: 0.9; }
+  90%  { opacity: 0.85; }
+  100% { transform: translateY(120px) translateX(var(--snow-drift, 10px)); opacity: 0; }
+}
+.twinkle-light {
+  position: absolute;
+  top: var(--tx-y, 10%);
+  left: var(--tx-x, 50%);
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--twinkle-color, #ff4d4d);
+  box-shadow: 0 0 5px 2px var(--twinkle-color, #ff4d4d);
+  opacity: 0.2;
+  animation: twinkle-pulse var(--twinkle-dur, 1.4s) ease-in-out infinite;
+  animation-delay: var(--twinkle-delay, 0s);
+}
+@keyframes twinkle-pulse {
+  0%, 100% { opacity: 0.15; transform: scale(0.8); }
+  50%      { opacity: 1; transform: scale(1.2); }
+}
 
 .spotify-bar.artist-ag5 {
   border-color: rgba(143,227,136,0.4);
