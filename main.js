@@ -421,6 +421,10 @@ ipcMain.on('spotify-set-volume', (event, percent) => {
 ipcMain.on('spotify-seek', (event, positionMs) => {
   spotifyAuth.seek(positionMs);
 });
+ipcMain.on('spotify-repeat', async (event, state) => {
+  await spotifyAuth.setRepeatMode(state);
+  refreshSpotifySoon();
+});
 
 // Push the current now-playing state to the renderer. When connected, the
 // Web API's track/artist/paused/progress/volume are authoritative — the local
@@ -441,6 +445,7 @@ function pushSpotifyNowPlaying() {
           if (state.durationMs) localData.duration_sec = state.durationMs / 1000;
           localData.volumePercent = state.volumePercent;
           localData.deviceName = state.deviceName;
+          localData.repeatState = state.repeatState;
           if (state.track) {
             localData.track = state.track;
             localData.artist = state.artist;

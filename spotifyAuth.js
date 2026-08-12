@@ -233,10 +233,25 @@ async function getPlayerState() {
       artist: data.item ? (data.item.artists || []).map((a) => a.name).join(', ') : '',
       deviceId: data.device.id,
       deviceName: data.device.name,
-      volumePercent: data.device.volume_percent
+      volumePercent: data.device.volume_percent,
+      repeatState: data.repeat_state || 'off'
     };
   } catch (e) {
     return null;
+  }
+}
+
+async function setRepeatMode(state) {
+  const accessToken = await getValidAccessToken();
+  if (!accessToken) return false;
+  try {
+    const resp = await fetch(`https://api.spotify.com/v1/me/player/repeat?state=${state}`, {
+      method: 'PUT',
+      headers: { 'Authorization': `Bearer ${accessToken}` }
+    });
+    return resp.ok;
+  } catch (e) {
+    return false;
   }
 }
 
@@ -338,5 +353,5 @@ function webPrevious() { return webPlayerCommand('POST', 'previous'); }
 module.exports = {
   startAuthFlow, isConnected, disconnect, getNextTrack,
   webPlayPause, webNext, webPrevious,
-  getPlayerState, getDevices, switchDevice, setVolume, seek
+  getPlayerState, getDevices, switchDevice, setVolume, seek, setRepeatMode
 };

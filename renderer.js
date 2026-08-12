@@ -1239,6 +1239,33 @@ function updateSpotifyUI(data) {
   }
 
   setPlayIcon(spotifyIsPlaying);
+  if (data.repeatState) {
+    updateRepeatUI(data.repeatState);
+  }
+}
+
+let spotifyRepeatState = 'off';
+function updateRepeatUI(state) {
+  spotifyRepeatState = state || 'off';
+  if (!spotifyConnected) {
+    btnSpotifyRepeat.classList.add('hidden');
+    return;
+  }
+  btnSpotifyRepeat.classList.remove('hidden');
+
+  if (spotifyRepeatState === 'track') {
+    btnSpotifyRepeat.textContent = '🔂';
+    btnSpotifyRepeat.classList.add('active');
+    btnSpotifyRepeat.title = 'Repeat Mode: One';
+  } else if (spotifyRepeatState === 'context') {
+    btnSpotifyRepeat.textContent = '🔁';
+    btnSpotifyRepeat.classList.add('active');
+    btnSpotifyRepeat.title = 'Repeat Mode: All';
+  } else {
+    btnSpotifyRepeat.textContent = '🔁';
+    btnSpotifyRepeat.classList.remove('active');
+    btnSpotifyRepeat.title = 'Repeat Mode: Off';
+  }
 }
 
 ipcRenderer.on('spotify-update', (event, data) => {
@@ -1261,6 +1288,7 @@ function showSpotifyConnectPrompt(show) {
   if (show) spotifyNextRow.classList.add('hidden');
   spotifyConnected = !show;
   btnSpotifyMore.classList.toggle('hidden', show);
+  btnSpotifyRepeat.classList.toggle('hidden', show);
   if (show) closeSpotifyPopover();
 }
 
@@ -1400,4 +1428,15 @@ btnSpotifyPrev.addEventListener('click', () => {
   spotifyIsPlaying = true;
   lastSyncTime = Date.now();
   setPlayIcon(true);
+});
+
+btnSpotifyRepeat.addEventListener('click', () => {
+  if (!spotifyConnected) return;
+  let nextState = 'off';
+  if (spotifyRepeatState === 'off') nextState = 'context';
+  else if (spotifyRepeatState === 'context') nextState = 'track';
+  else nextState = 'off';
+
+  updateRepeatUI(nextState);
+  ipcRenderer.send('spotify-repeat', nextState);
 });
