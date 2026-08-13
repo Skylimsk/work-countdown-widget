@@ -1,7 +1,6 @@
-const { ipcRenderer } = require('electron');
-
 // 📢 自启动强自显补丁：解决程序在后台打开却不在桌面显示的 Bug
 (function forceShowOnStartup() {
+  const { ipcRenderer } = require('electron');
   setTimeout(() => {
     // 1. 发送 IPC 给主进程，强行显示窗口
     ipcRenderer.send('force-show-window');
