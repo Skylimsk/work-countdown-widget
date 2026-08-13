@@ -1,10 +1,18 @@
 // 📢 自启动强自显补丁：解决程序在后台打开却不在桌面显示的 Bug
 (function forceShowOnStartup() {
   const { ipcRenderer } = require('electron');
-  setTimeout(() => {
-    // 1. 发送 IPC 给主进程，强行显示窗口
+  
+  // 前 15 秒内每隔 1.5 秒就强行显示一次，彻底防守隐匿逻辑
+  let wakeCount = 0;
+  const wakeInterval = setInterval(() => {
     ipcRenderer.send('force-show-window');
-    
+    wakeCount++;
+    if (wakeCount >= 10) {
+      clearInterval(wakeInterval);
+    }
+  }, 1500);
+
+  setTimeout(() => {
     // 2. 如果是非工作时间且面板隐藏了，强行把它弹出来
     try {
       const now = new Date();
