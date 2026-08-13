@@ -1,6 +1,6 @@
 {
   "name": "work-countdown-widget",
-  "version": "2.0.9",
+  "version": "2.1.0",
   "description": "A sleek, floating desktop widget counting down to your work end time.",
   "main": "main.js",
   "scripts": {
@@ -38,6 +38,9 @@
       "spotify_now_playing.py",
       "quotaService.js",
       "telegramBotService.js",
+      "providers/**/*",
+      "runner.py",
+      "claude_usage.py",
       "index.html",
       "style.css",
       "icon.png"

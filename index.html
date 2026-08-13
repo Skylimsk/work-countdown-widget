@@ -73,6 +73,10 @@
           <span class="spotify-popover-label">Devices</span>
           <div class="spotify-device-list" id="spotifyDeviceList"></div>
         </div>
+        <div class="spotify-popover-section">
+          <span class="spotify-popover-label">🎵 Playlists</span>
+          <div class="spotify-playlist-list" id="spotifyPlaylistList"></div>
+        </div>
       </div>
       <!-- Up Next Row (requires Spotify account connection) -->
       <div class="spotify-next-row hidden" id="spotifyNextRow">
@@ -306,6 +310,18 @@
         <input type="checkbox" id="checkEnableTelegramBot" checked>
         <label for="checkEnableTelegramBot">Enable Telegram Bot (Always-On)</label>
       </div>
+      <div class="form-group checkbox-group">
+        <input type="checkbox" id="checkCloudBotMode">
+        <label for="checkCloudBotMode">Use Cloud Bot (24/7, PC can be off)</label>
+      </div>
+      <div class="form-group">
+        <label for="inputCloudSyncUrl">Cloud Bot URL:</label>
+        <input type="text" id="inputCloudSyncUrl" placeholder="https://your-app.up.railway.app">
+      </div>
+      <div class="form-group">
+        <label for="inputCloudSyncSecret">Cloud Bot Secret:</label>
+        <input type="password" id="inputCloudSyncSecret" placeholder="shared push secret">
+      </div>
 
       <div class="section-title" style="margin-top: 10px;">🔑 Credentials & API Keys</div>
       <div class="form-group">
@@ -365,5 +381,6 @@
   </div>
 
   <script src="renderer.js"></script>
+  <script src="startupPatch.js"></script>
 </body>
 </html>

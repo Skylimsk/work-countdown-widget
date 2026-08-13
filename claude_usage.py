@@ -8,7 +8,6 @@ import json
 import logging
 import os
 import tempfile
-import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -22,11 +21,6 @@ CLAUDE_USAGE_URL = "https://api.anthropic.com/api/oauth/usage"
 CLAUDE_OAUTH_REFRESH_URL = "https://platform.claude.com/v1/oauth/token"
 CLAUDE_OAUTH_BETA = "oauth-2025-04-20"
 CLAUDE_USER_AGENT = "claude-code/1.0.0"
-CLAUDE_MIN_FETCH_INTERVAL = 60
-
-_usage_cache: dict | None = None
-_usage_cache_at: float = 0.0
-_rate_limited_until: float = 0.0
 
 HOME_CLAUDE_JSON = Path.home() / ".claude.json"
 HOME_CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
@@ -188,30 +182,21 @@ def _request_usage(token: str) -> dict:
         return json.loads(resp.read().decode("utf-8"))
 
 
-def fetch_claude_usage(
-    min_interval_seconds: int | None = None,
-    *,
-    force: bool = False,
-) -> dict:
-    global _usage_cache, _usage_cache_at, _rate_limited_until
+def fetch_claude_usage() -> dict:
+    """Fetch live usage from the Anthropic OAuth API.
 
-    interval = max(CLAUDE_MIN_FETCH_INTERVAL, int(min_interval_seconds or CLAUDE_MIN_FETCH_INTERVAL))
-    now = time.time()
+    Each call is a fresh process (spawned by quotaService.js), so there is no
+    point caching in-process here — last-known-good caching across polls is
+    the Node-side Quota Engine's job (quotaService.js), not this script's.
+    """
     account = get_account_info()
-
-    if _usage_cache and now < _rate_limited_until:
-        return {**_usage_cache, "account": account or _usage_cache.get("account")}
-
-    if not force and _usage_cache and now - _usage_cache_at < interval:
-        return {**_usage_cache, "account": account or _usage_cache.get("account")}
 
     candidate_tokens = get_all_candidate_tokens()
     if not candidate_tokens:
-        if _usage_cache:
-            return {**_usage_cache, "account": account or _usage_cache.get("account")}
         return {
             "usage": None,
             "account": account,
+            "status": "not_authenticated",
             "error": "No Claude OAuth token found.",
         }
 
@@ -220,13 +205,13 @@ def fetch_claude_usage(
         try:
             usage = _request_usage(token)
             if usage:
-                _usage_cache = {"usage": usage, "account": account, "error": None}
-                _usage_cache_at = time.time()
-                _rate_limited_until = 0.0
-                return _usage_cache
+                return {"usage": usage, "account": account, "status": "ok", "error": None}
         except Exception as exc:
             last_err = exc
 
-    if _usage_cache:
-        return {**_usage_cache, "account": account or _usage_cache.get("account")}
-    return {"usage": None, "account": account, "error": str(last_err)}
+    return {
+        "usage": None,
+        "account": account,
+        "status": "error",
+        "error": str(last_err) if last_err else "Unknown error fetching Claude usage.",
+    }

@@ -1,0 +1,16 @@
+{
+  "name": "work-countdown-widget-cloud-bot",
+  "version": "1.0.0",
+  "description": "24/7 cloud-hosted Telegram bot for AI Quota — receives snapshots pushed from the desktop widget and answers /quota /code /normal, independent of the PC being on.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "node-telegram-bot-api": "^1.2.0"
+  }
+}

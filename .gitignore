@@ -24,3 +24,6 @@ widget-debug.log
 .DS_Store
 .claude/
 .vscode/
+
+# Cloud bot runtime state
+cloud-bot/state.json

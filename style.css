@@ -337,7 +337,7 @@ html, body {
 
 .spotify-popover {
   position: absolute; top: 100%; right: 8px; margin-top: 4px;
-  width: 150px; z-index: 30;
+  width: 170px; z-index: 30;
   background: var(--bg-base); border: 1px solid var(--border); border-radius: var(--r-md);
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
   padding: 8px; display: flex; flex-direction: column; gap: 8px;
@@ -346,16 +346,16 @@ html, body {
 .spotify-popover-section { display: flex; flex-direction: column; gap: 4px; }
 .spotify-popover-label { font-size: 8.5px; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: 0.3px; }
 .spotify-volume-slider { width: 100%; accent-color: var(--day-primary); cursor: pointer; }
-.spotify-device-list { display: flex; flex-direction: column; gap: 2px; max-height: 110px; overflow-y: auto; }
-.spotify-device-item {
+.spotify-device-list, .spotify-playlist-list { display: flex; flex-direction: column; gap: 2px; max-height: 100px; overflow-y: auto; }
+.spotify-device-item, .spotify-playlist-item {
   display: flex; align-items: center; gap: 5px;
   font-size: 9.5px; color: var(--text-2); padding: 3px 5px; border-radius: var(--r-sm);
   cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   transition: background var(--ease), color var(--ease);
 }
-.spotify-device-item:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
+.spotify-device-item:hover, .spotify-playlist-item:hover { background: rgba(255,255,255,0.08); color: var(--text-1); }
 .spotify-device-item.active { color: var(--day-primary); font-weight: 700; }
-.spotify-device-empty { font-size: 9px; color: var(--text-3); padding: 3px 5px; }
+.spotify-device-empty, .spotify-playlist-empty { font-size: 9px; color: var(--text-3); padding: 3px 5px; }
 
 /* ─── Artist Fan Colors (應援色) — overrides the day-of-week accent for matched artists ─── */
 
