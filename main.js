@@ -6,5 +6,20 @@ ipcMain.on('force-show-window', () => {
     mainWindow.show();
     mainWindow.focus();
     mainWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+    try {
+      mainWindow.webContents.openDevTools({ mode: 'detach' });
+    } catch (e) {}
   }
 });
+
+// 主进程 2.5秒 兜底强显：确保窗口 100% 出现，绝不隐身在托盘
+setTimeout(() => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.show();
+    mainWindow.focus();
+    mainWindow.setAlwaysOnTop(true, 'screen-saver', 1);
+    try {
+      mainWindow.webContents.send('non-working-app-active');
+    } catch (e) {}
+  }
+}, 2500);
