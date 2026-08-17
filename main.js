@@ -6,9 +6,6 @@ ipcMain.on('force-show-window', () => {
     mainWindow.show();
     mainWindow.focus();
     mainWindow.setAlwaysOnTop(true, 'screen-saver', 1);
-    try {
-      mainWindow.webContents.openDevTools({ mode: 'detach' });
-    } catch (e) {}
   }
 });
 

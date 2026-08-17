@@ -15,15 +15,21 @@
   // 2. 动态感知与自动收缩布局：每 800ms 执行一次状态刷新
   setInterval(() => {
     try {
-      // 🎹 动态 Spotify 检测显示：只有正在放歌才显示 Spotify Now Playing Bar
+      // 🎹 动态 Spotify 检测显示：只有正在播放音乐时，才显示播放卡片
       const spotifyBar = document.getElementById('spotifyBar');
       const spotifyTrack = document.getElementById('spotifyTrack');
+      const btnSpotifyPlay = document.getElementById('btnSpotifyPlay'); // 用以辅助判断播放/暂停状态
       
       if (spotifyBar && spotifyTrack) {
         const trackName = (spotifyTrack.textContent || '').trim();
-        const isNotPlaying = !trackName || trackName === 'Not Playing';
+        const isNotPlaying = !trackName || trackName === 'Not Playing' || trackName === 'Not playing';
         
-        if (isNotPlaying) {
+        // 只有当歌曲名字不是 "Not Playing" 且播放按钮上处于播放状态（可以通过按钮文本或者属性判断）
+        // renderer.js 会在暂停时更新图标，或者我们可以直接检测有没有正在放歌
+        // 我们甚至可以通过全局状态判断。但为了安全，直接通过 trackName 和播放状态：
+        const isPaused = btnSpotifyPlay ? (btnSpotifyPlay.textContent.includes('▶') || btnSpotifyPlay.textContent.includes('Play')) : false;
+
+        if (isNotPlaying || isPaused) {
           if (spotifyBar.style.display !== 'none') {
             spotifyBar.style.display = 'none';
           }
@@ -34,26 +40,40 @@
         }
       }
 
-      // 🤖 动态 AI 开发 App 检测显示：如果没有正在运行的 AI / Dev App 卡片，把它们归类隐藏
-      // 判断机制：如果所有 App 卡片里面都是 hidden 状态或者没有活跃数据，我们就整体折叠起来
+      // 🤖 动态 AI 开发 App 检测显示：只有对应的 EXE 软件被打开时才显示对应卡片和 AI 区域
       const appCards = document.querySelectorAll('.ai-app-card');
       let anyAppVisible = false;
       appCards.forEach(card => {
-        // 如果卡片没有 hidden 类，说明检测到了它的运行
+        // 主进程检测到 EXE 没开时，会在卡片 class 上加上 'hidden'
+        // 所以我们只需判断是否有任何卡片去除了 'hidden'
         if (card && !card.classList.contains('hidden')) {
           anyAppVisible = true;
+          // 显式确保正在运行的 EXE 卡片有高度
+          card.style.display = 'flex';
+        } else if (card) {
+          // 没开的 EXE 卡片直接彻底不显示，不占高度
+          card.style.display = 'none';
         }
       });
 
-      // 📏 物理高度实时自适应计算，允许自由收缩回 42px 的紧凑桌面条！
-      // 获取当前所有可见内容的真实物理高度
+      // 如果没有任何 AI/Dev 软件正在运行，把包含 quota 整体和卡片的容器都彻底折叠起来
+      const sectionClaudeApp = document.getElementById('sectionClaudeApp');
+      const sectionAntigravityApp = document.getElementById('sectionAntigravityApp');
+      const quotaHeader = document.querySelector('.quota-header'); // Quota 面板标题
+
+      if (!anyAppVisible) {
+        if (sectionClaudeApp) sectionClaudeApp.style.display = 'none';
+        if (sectionAntigravityApp) sectionAntigravityApp.style.display = 'none';
+        if (quotaHeader) quotaHeader.style.display = 'none';
+      } else {
+        if (quotaHeader) quotaHeader.style.display = 'block';
+      }
+
+      // 📏 物理高度实时自适应计算，允许自由收缩回 42px 的超窄倒计时桌面条！
       const mainContainer = document.querySelector('.container') || document.body;
       const visibleHeight = mainContainer.scrollHeight || 42;
-      
-      // 读取当前小工具宽度（默认 170px 紧凑版，展开时可能稍大）
       const currentWidth = mainContainer.clientWidth || 170;
       
-      // 主动把真实高度推送给主进程，绝不强占 100px！
       ipcRenderer.send('window-action', { 
         width: currentWidth, 
         height: visibleHeight, 
@@ -65,14 +85,13 @@
     }
   }, 800);
 
-  // 3. 非工作时间自启询问控制
+  // 3. 非工作时间自启询问控制：只有检测到 AI App 打开时才弹 OT 面板
   setTimeout(() => {
     try {
       const now = new Date();
       const day = now.getDay();
       const isWeekendDay = (day === 0 || day === 6);
       
-      // 获取当前用户的配置
       const config = ipcRenderer.sendSync('get-config') || {};
       const [sH, sM] = (config.startTime || '09:00').split(':').map(Number);
       const [eH, eM] = (config.endTime || '18:00').split(':').map(Number);
@@ -82,7 +101,6 @@
       const isOffHours = isWeekendDay || (currentMins < startMins || currentMins >= endMins);
 
       if (isOffHours) {
-        // 如果当前是加班时间，并且确实检测到了 AI 开发 App 运行，才强制唤醒弹窗！
         const otPromptView = document.getElementById('otPromptView');
         const appCards = document.querySelectorAll('.ai-app-card');
         let hasActiveDevApp = false;
