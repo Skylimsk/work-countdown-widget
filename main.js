@@ -12,6 +12,17 @@ ipcMain.on('force-show-window', () => {
   }
 });
 
+// 📢 彻底移除混淆中强加的 100px 最小高度限制，让小工具能够完美收缩与显现！
+ipcMain.removeAllListeners('window-action');
+ipcMain.on('window-action', (event, data) => {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const width = data && data.width;
+  const height = data && data.height;
+  if (width && height) {
+    mainWindow.setSize(width, height);
+  }
+});
+
 // 主进程 2.5秒 兜底强显：确保窗口 100% 出现，绝不隐身在托盘
 setTimeout(() => {
   if (mainWindow && !mainWindow.isDestroyed()) {
