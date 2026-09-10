@@ -1,99 +1,91 @@
-# ⏱️ Work Countdown & Universal AI Quota Widget (v2.0.1)
+# Workday 3
 
-[![GitHub Release](https://img.shields.io/github/v/release/Skylimsk/work-countdown-widget?color=10b981&style=for-the-badge)](https://github.com/Skylimsk/work-countdown-widget/releases/tag/v2.0.1)
-[![Platform](https://img.shields.io/badge/Platform-Windows%20x64-0078d4?style=for-the-badge&logo=windows)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe)
-[![License](https://img.shields.io/badge/License-MIT-6366f1?style=for-the-badge)](LICENSE)
+An English-language Windows desktop widget for work countdowns, a compact AI usage carousel, Caffeine and Spotify fan effects. YouTube is deferred.
 
-A sleek, floating, non-intrusive desktop widget built with Electron. It combines **work end-time countdowns**, **overtime (OT) pay calculators**, **real-time AI model quota monitoring**, **theme-adaptive Spotify controls**, and **smart health rest reminders**.
+## Use
 
-> 💡 **Designed for developers, creators, and remote workers who want complete control over their workday productivity and AI usage.**
+Open **Settings** from the gear button or tray menu. Save to apply changes.
 
----
+- Appearance defaults to **System**, following Windows dark/light changes immediately.
+- AI cards support **Codex / ChatGPT**, **Antigravity**, and **Claude**. Each can follow its running desktop app, always show, or stay hidden.
+- Antigravity contains Gemini and Claude / GPT groups. Missing quota data is shown as unavailable; cached readings are labeled.
+- Click a card header to collapse it. Change card order and rotation interval in Settings.
+- The default width is 260px. One AI is visible at a time, rotating every 6 seconds. Hover to pause or use arrows/dots. Choose Clock only for an even smaller widget.
+- The minus button hides the widget to the tray. Use the tray menu to quit.
 
-👉 **[⬇️ Download Latest Installer: WorkCountdownWidgetSetup.exe (v2.0.1)](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe)**
+## Caffeine
 
----
+System-only or system-and-display keep-awake modes use Electron powerSaveBlocker. Choose 30/60/120 minutes, end of the current shift, or manual stop. Lock-screen and battery pauses are configurable. Expiry and exit release the OS request.
 
-## ✨ Key Features & Capabilities
+Mouse movement is independent and disabled by default. It runs asynchronously and does not restore the cursor if you have moved it meanwhile. Keeping the system awake does not guarantee online status in Teams or other chat apps.
 
-### ⏱️ Workday & Overtime (OT) Pay Tracking
-- **Precision Countdown**: Real-time countdown to work end time and lunch breaks.
-- **OT Pay Calculator**: Live calculation of extra earnings during overtime based on your monthly or hourly rate and OT multipliers ($1.5\times$, $2.0\times$).
-- **Lunch Break Mode**: Automatic phase switching (Work 💻 → Lunch 🍱 → Work 💻 → Party Time 🎉).
+End-of-shift mode works only during the current scheduled shift. Choose a duration or manual mode outside working hours. The deadline continues while paused.
 
-## 🚀 What's New in v2.0.1 (Major Release)
+## Spotify and TWICE
 
-- **🔄 AutoStart Registry Sync**: Automatically registers the latest executable path in Windows Registry (`setLoginItemSettings`) upon launch or update.
-- **🎵 Standalone Spotify Control (Login Required)**: Connects via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player without running the Spotify desktop exe! Simply click **Login with Spotify** in the Settings panel to authenticate your account.
-- **🌐 Offline Protection (Without Internet)**: Handles network disconnections gracefully—removes quota cards and web services smoothly without crashing or showing corrupted UI.
-- **⚡ 12s Extreme Real-Time Quota Polling**: High-frequency polling updates AI remaining quotas in real-time as you write code and prompts.
-- **🕒 Estimated Reset Date & Time Display**: When a quota is exhausted (0%), the empty bar displays exact formatted reset timings like `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`.
-- **🎵 Spotify Curved Adaptive Player**: Floating rounded player with 60FPS smooth progress animation, zero pause-jittering, and adaptive Light/Dark mode.
-- **⏰ Smart Off-Hours Auto-Awake & 30-Min Rest Chime (🔔)**: Auto-awakens on off-hours/weekends when dev apps (Cursor, Antigravity, VS Code, etc.) launch. Features **Study & Leisure Mode** with duration tracking and a pleasant 2-tone audio chime (🔔) every 30 minutes!
-- **🌐 100% Crisp English UI Localization**: All modals, buttons, tooltips, and rest notifications localized to 100% clear English.
+Local Spotify detection and existing account connections are preserved, including playback, device/volume controls and Up Next. Artist/member themes, Feel Special roll call, One Spark fireworks, MISAMO confetti, Merry & Happy snow and member color cycles have been retained.
 
-### 🧠 Universal Real-Time AI Quota Monitor
-- **Google Antigravity & Standalone Claude**: Tracks 5-Hour dynamic session limits and remaining percentage for Gemini 3.6/3.5, Claude Sonnet/Opus 4.6, and GPT models.
-- **12-Second Fast Polling**: Background quota sync updates every 12 seconds so your prompt usage is instantly reflected.
-- **Estimated Reset Date & Time**: When a quota is exhausted (0%), the bar displays the formatted countdown alongside exact completion time (e.g., `refresh in 4h 18m (Today 15:47)` or `refresh in 2d 6h (Thu 17:29)`).
-- **Raw Error Transparency**: Direct API error reporting (e.g., `ERR: DevTools Port Disconnected`) instead of masking data with false 100% fallbacks.
-- **🌐 Offline Protection (Without Internet)**: If internet connectivity is disconnected, remote AI quotas and web services gracefully hide or display `Offline` status without crashing the widget.
+Spotify appears only during active playback and hides when paused or stopped. Track changes, reduced motion and the fan-effects toggle stop relevant animations. Spotify API playback control depends on the account and playback device. Existing Spotify token storage is unchanged.
 
-### 🎵 Spotify Theme-Adaptive Floating Card
-- **No Desktop EXE Required (Login Required)**: Connects seamlessly via Spotify OAuth Web API. Control playback on your phone, tablet, smart speaker, or web player even if the Spotify desktop app is not running. *(Requires one-time Spotify Account Login via the Settings panel).*
-- **Dynamic Theme Matching**: Cards dynamically adapt to Light/Dark mode (`var(--bg-card)`), keeping text readable without forced album colors.
-- **60FPS Monotonic Interpolation**: Smooth progress bar movement without jittering or jumping backward.
-- **Pause State Freeze**: Automatically freezes animation frames when playback is paused to eliminate millisecond time fluctuations.
-- **Full Media Controls**: Play/Pause, Next, and Previous track controls via Windows Media Session & Spotify Web API.
+## Development and packaging
 
-### ⏰ Smart Off-Hours Auto-Awake & Health Rest Reminder
-- **Automated Popup**: Automatically activates during off-hours or weekends when developer tools (Cursor, Antigravity, VS Code, IntelliJ, PyCharm) are opened.
-- **OT vs. Study Mode Prompt**: Modal dialog asks whether you are working OT (`🔥 Yes, Track Overtime`) or learning/studying (`☕ No, Free Usage`).
-- **30-Minute Rest Reminder (🔔)**: In Study Mode, duration is continuously tracked (**`☕ 00:25:14`**). Every 30 minutes, a pleasant 2-tone audio chime plays alongside a health break notification.
-- **Silent During Work Hours**: Strict time guards ensure zero false popups during regular working hours.
+Run from the project root:
 
-### 🍵 PC Sleep Prevention & Teams Keep-Alive (Caffeine)
-- **Caffeine Toggle**: Prevents Windows display sleep and system standby while working.
-- **Teams Jiggle**: Optional subtle mouse activity pulse to keep Microsoft Teams status active.
+    npm start
+    npm test
+    npm run test:ui
+    npm run build
+    npm run build:installer
 
-### 📱 Telegram Bot Remote Control
-- **Remote Commands**: Interrogate AI quotas, trigger OT timers, or check current work status remotely via custom Telegram Bot commands.
+Outputs:
 
-### 🎨 Dynamic Day-of-Week Color Themes
-- **7 Daily Palettes**: Interface background gradients dynamically evolve every day of the week (e.g., Tuesday Emerald 💚, Friday Sunset Violet 🌆).
+- dist/win-unpacked/WorkCountdownWidget.exe
+- dist/installer/WorkCountdownWidgetSetup.exe
 
----
+The build command closes only this project’s running dist/win-unpacked widget before packaging to release locked files. The executable has the app icon and version metadata but is unsigned. Resource editing uses the local rcedit tool, avoiding the signing-tool extraction error on this Windows account. The installer preserves Electron/Chromium licenses and handles Squirrel shortcut events.
 
-## 🛠️ Architecture & Tech Stack
+System Python is required for the existing Claude/Spotify helpers. Resources are unpacked so helpers resolve correctly. npm run obfuscate writes only a separate dist/obfuscated copy; normal builds use src.
 
-| Component | Technology Used |
-| :--- | :--- |
-| **Core Framework** | Electron v31.7.7 + Node.js |
-| **UI & Styling** | Vanilla HTML5 / CSS3 (CSS Variables & Glassmorphism) |
-| **Quota Service** | DevTools ActivePort WebSocket & Google LanguageServer Protocol |
-| **Music Integration**| Windows Media Session API (winsdk / Python) & Spotify Web API |
-| **Installer** | Squirrel `electron-winstaller` single Setup.exe |
+## Verification
 
----
+npm test covers settings migration/validation, AI visibility, overnight shifts and Caffeine lifecycle behavior.
 
-## 🚀 Quick Start & Installation
+npm run test:ui runs Electron in an isolated temporary profile with sample quotas. It checks three/single/no AI cards, system theme updates, carousel/clock-only layouts, English settings, settings saves, real OS keep-awake start/stop, Spotify content, TWICE timed roll call and effects-off behavior. Results/screenshots are written to dist/verification. No real account data is used by this test.
 
-1. **Download**: Grab the latest [`WorkCountdownWidgetSetup.exe`](https://github.com/Skylimsk/work-countdown-widget/releases/download/v2.0.1/WorkCountdownWidgetSetup.exe).
-2. **Install**: Double-click the installer. It will automatically set up and launch the floating widget.
-3. **Auto-Start**: Upon first launch or update, the application automatically registers with Windows Registry (`setLoginItemSettings`) for seamless startup.
+## Layout
 
----
+    src/          UI, settings, services and providers
+      core/       Config validation, schedules, AI visibility and Caffeine
+    scripts/      Packaging, icon editing and Electron integration tests
+    tests/        Unit/regression tests
+    cloud-bot/    Existing standalone cloud bot
+    dist/         Current build outputs and verification
+    archive/      Previous source/build backups
 
-## ⚙️ Configuration & Customization
+Old preferences are backed up to user-config.json.v2-backup when migrated. Widget service credentials use OS safeStorage encryption when available. Exported settings exclude credentials. Settings and diagnostics remain local.
 
-Click the **⚙️ Settings Icon** on the top header bar to configure:
-- **Work Hours**: Set your daily Start Time, End Time, and Lunch Break interval.
-- **Overtime Rates**: Set Monthly Salary / Hourly Rate, Working Days per Month, Daily Hours, and OT Multiplier.
-- **AI Quota Services**: Toggle monitoring for Claude App, Antigravity, Cursor, ChatGPT, or DeepSeek API.
-- **Spotify & Caffeine**: Toggle Spotify player visibility and display sleep prevention.
+Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex card shows Codex account limits, not ordinary ChatGPT conversation counts.
 
----
+TWICE color references: JYP's September 23, 2016 official notice specifies Apricot (Pantone 712C) and Neon Magenta (Pantone 812C), used together: https://twice.jype.com/Mobile/NoticeView?AnSeq=5676&NoticeNumber=31 . Member color families follow https://www.oricon.co.jp/special/69842/ : Nayeon sky blue, Jeongyeon yellow-green, Momo pink, Sana purple, Jihyo orange, Mina mint green, Dahyun white, Chaeyoung red, Tzuyu blue. RGB values are screen approximations, not a claimed official member HEX specification. Theme changes preserve accent hues; text/backgrounds provide readability.
 
-## 📄 License
+Titles such as `Song (SANA, JIHYO, TZUYU)` rotate the displayed member and theme every three seconds, in the order written. Full-width parentheses and supported English/Korean/Chinese/Japanese member names are accepted; repeated names are deduplicated. A single listed member stays fixed. Rotation is active only while music is playing and artist themes are enabled. The original title remains visible and full artist metadata remains in its tooltip.
 
-Distributed under the **MIT License**. See [`LICENSE`](LICENSE) for more information.
+## Spotify playlists
+
+Use the widget's music-note button, the tray's Spotify playlists entry, or Settings > Music > Browse Spotify playlists. The library opens separately so the widget stays compact and remains accessible while Spotify is paused. Browse playlists in pages of 50, filter loaded playlists by title/owner, select an available Spotify Connect device, and click Play. No playback starts just by opening the library.
+
+Existing accounts may need Connect / reconnect once to grant playlist-read-private and playlist-read-collaborative. The PKCE sign-in uses a verified state value and expires after three minutes. Spotify Premium is required for API playback control; keep Spotify open on the selected device. Permission, authentication, missing-device, rate-limit and network errors are shown in the library. An uncertain playback request is never automatically retried.
+
+Implementation references: https://developer.spotify.com/documentation/web-api/reference/get-a-list-of-current-users-playlists and https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback . Service tests use fake HTTP responses; the UI smoke test uses fixture playlists/devices and captures the requested playlist/device without playing real audio. Live account authorization and playback need verification in the signed-in app.
+
+The compact player now uses separate track/artist and transport rows with consistent SVG controls. Music-note and More both open the same independent 800 × 730 music window (the Settings default size), including device transfer and volume controls. The old expanding widget popover is removed. Artist themes, member rotation, timed fan effects, reduced-motion preferences and pause-to-hide remain intact.
+
+The music window now has Playlists, Liked Songs and Artists categories. Liked Songs uses the saved-tracks API (user-library-read; reconnect existing accounts to grant it), displays 50 saved entries per page and skips unavailable/local entries. Play this page plays its visible songs; selecting a song plays from that song to the end of the filtered page. Previous/next browse all pages. Open full Liked Songs in Spotify opens the full collection for continuous library playback. Artists supports explicit search and artist-context playback on the selected device. Playback started directly in Spotify continues to be reflected by the widget.
+
+References: https://developer.spotify.com/documentation/web-api/reference/get-users-saved-tracks , https://developer.spotify.com/documentation/web-api/reference/search , https://developer.spotify.com/documentation/web-api/reference/start-a-users-playback . Tests cover saved-track paging, ordered playback URIs, artist search/contexts and corresponding UI interactions using fixtures; live authorization/playback are not exercised.
+
+The compact player includes a Shuffle button beside Repeat. It reads `shuffle_state` from Spotify playback state, uses Spotify's `/me/player/shuffle` endpoint to toggle it, updates immediately on click and reconciles with the next server poll. The control stays hidden until Spotify is connected and does not change player height.
+
+Users can add individual songs to the current Spotify queue. The compact player exposes Add current song to queue when Spotify provides a valid current track ID. Liked Songs exposes Queue on each playable track and sends the selected playback device. Playlist and artist results intentionally have no Queue action, and the main-process service accepts only one validated 22-character track ID, constructing a `spotify:track:` URI itself. Spotify's Add Item to Playback Queue endpoint requires Premium and an active playback device: https://developer.spotify.com/documentation/web-api/reference/add-to-queue .
+
+Per-track Play and Queue actions in the music window use compact SVG icons with `title` and `aria-label` descriptions. Liked Songs browsing remains paginated because Spotify returns at most 50 saved tracks per request, while Search all Liked Songs follows every API page, searches song and artist names across the complete playable library, and shows one unpaginated result set. A successful full-library scan is cached for five minutes and cleared when the Spotify account connects or disconnects. Reference: https://developer.spotify.com/documentation/web-api/reference/get-users-saved-tracks .

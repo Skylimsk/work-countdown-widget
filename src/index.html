@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-GB"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'none'"><title>Workday 3</title><link rel="stylesheet" href="music.css"><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="player.css"></head>
+<body class="widget-page"><main class="shell" id="shell">
+<header class="titlebar"><div class="brand"><span class="brand-dot"></span>WORKDAY <span class="version">03</span></div><div class="window-actions"><button id="playlistButton" title="Spotify library" aria-label="Spotify library">♫</button><button id="headerCaffeine" title="Toggle Caffeine" aria-label="Toggle Caffeine" aria-pressed="false">☕</button><button id="layoutToggle" title="Toggle compact layout" aria-label="Toggle compact layout">▤</button><button id="settingsButton" title="Settings" aria-label="Settings">⚙</button><button id="hideButton" title="Hide to tray" aria-label="Hide to tray">−</button></div></header>
+<section class="countdown"><div class="eyebrow" id="phaseLabel">Time until home</div><div class="clock" id="clock">--:--:--</div><div class="clock-meta"><span id="scheduleLabel">09:00 — 18:00</span><span id="progressLabel">—</span></div><div class="stage-strip" id="stageStrip" aria-label="Workday countdown stages"><span data-stage="start">Start</span><span data-stage="lunch">Lunch</span><span data-stage="home">Home</span></div><div class="meter"><span id="workProgress"></span></div><div id="otActions" class="ot-actions" hidden><button id="otButton">Start overtime</button><span id="otPay"></span></div></section>
+<div class="caffeine-row"><button id="caffeineToggle" aria-pressed="false"><span>☕</span><span id="caffeineLabel">Caffeine off</span></button><span class="mini-status" id="caffeineDetail"></span></div>
+<section class="ai-section" id="aiSection"><div class="section-heading"><span>AI workspace <span id="aiCount"></span></span><button id="refreshAI" title="Refresh usage">Refresh</button></div><div id="aiCards" class="ai-cards"></div><nav id="carouselNav" class="carousel-nav" aria-label="AI carousel"><button id="previousAI" aria-label="Previous AI">‹</button><div id="carouselDots"></div><button id="nextAI" aria-label="Next AI">›</button></nav></section>
+    <!-- Spotify Now Playing Bar -->
+    <div class="spotify-bar" id="spotifyBar" style="display:none;">
+
+      <div class="fireworks-layer" id="fireworksLayer"></div>
+      <div class="confetti-layer" id="confettiLayer"></div>
+      <div class="christmas-layer" id="christmasLayer"></div>
+      <div class="spotify-main-row">
+        <div class="spotify-track-info"><div id="chantStage" class="chant-stage" hidden><div class="chant-heading"><span>TWICE CHANT</span><span id="chantCount"></span></div><span class="spotify-rollcall-name" id="spotifyRollcallName"></span><div class="chant-footer"><div id="chantDots" class="chant-dots"></div><span id="chantNext"></span></div></div>
+          <span class="spotify-icon">🎵</span>
+          <div class="spotify-text">
+            <span class="spotify-track" id="spotifyTrack">Not Playing</span>
+            <span class="spotify-artist" id="spotifyArtist"></span>
+          </div>
+        </div>
+        <button class="spotify-btn" id="btnSpotifyMore" title="Playlists, devices &amp; volume" aria-label="Playlists, devices and volume">⋯</button>
+      </div>
+      <div class="player-toolbar"><div class="spotify-controls">
+        <button class="spotify-btn" id="btnSpotifyPrev" title="Previous" aria-label="Previous track"></button>
+        <button class="spotify-btn" id="btnSpotifyPlay" title="Play" aria-label="Play"></button>
+        <button class="spotify-btn" id="btnSpotifyNext" title="Next" aria-label="Next track"></button>
+        <button class="spotify-btn hidden" id="btnSpotifyQueue" title="Add current song to queue" aria-label="Add current song to queue"></button>
+        <button class="spotify-btn hidden" id="btnSpotifyShuffle" title="Shuffle off" aria-label="Shuffle off"></button>
+        <button class="spotify-btn hidden" id="btnSpotifyRepeat" title="Repeat off" aria-label="Repeat off"></button>
+      </div><span class="spotify-time" id="spotifyTimeText">0:00 / 0:00</span></div>
+      <!-- Song Progress Bar Row (click to seek — requires Spotify connection) -->
+      <div class="spotify-progress-row">
+        <div class="spotify-progress-bg" id="spotifyProgressBg">
+          <div class="spotify-progress-fill" id="spotifyProgressFill"></div>
+        </div>
+
+      </div>
+      <!-- Up Next Row (requires Spotify account connection) -->
+      <div class="spotify-next-row hidden" id="spotifyNextRow">
+        <span class="spotify-next-icon">⏭</span>
+        <span class="spotify-next-label">Up Next</span>
+        <span class="spotify-next-text" id="spotifyNextText"></span>
+      </div>
+      <div class="spotify-connect-row hidden" id="spotifyConnectRow">
+        <button class="spotify-connect-btn" id="btnSpotifyConnect">Connect Spotify to show Up Next</button>
+      </div>
+    </div>
+
+
+<footer class="widget-footer"><span id="connectionInfo">Connecting to local services</span><span id="systemThemeLabel">System</span></footer>
+</main><script src="renderer.js"></script><script src="music.js"></script></body></html>

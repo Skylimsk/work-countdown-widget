@@ -38,8 +38,8 @@ function envelope(status, metrics, source, error) {
 
 function parseUsage(parsed) {
   const limits = parsed.usage.limits || [];
-  let sessionUsed = 0;
-  let weeklyUsed = 0;
+  let sessionUsed = null;
+  let weeklyUsed = null;
   let sessionReset = parsed.usage.five_hour?.resets_at || '';
   let weeklyReset = parsed.usage.seven_day?.resets_at || '';
 
@@ -61,8 +61,8 @@ function parseUsage(parsed) {
   }
 
   return {
-    session: { used: sessionUsed, remaining: Math.max(0, 100 - sessionUsed), resetAt: sessionReset },
-    weekly: { used: weeklyUsed, remaining: Math.max(0, 100 - weeklyUsed), resetAt: weeklyReset }
+    session: { used: sessionUsed, remaining: Number.isFinite(sessionUsed) ? Math.max(0, Math.min(100, 100-sessionUsed)) : null, resetAt: sessionReset },
+    weekly: { used: weeklyUsed, remaining: Number.isFinite(weeklyUsed) ? Math.max(0, Math.min(100, 100-weeklyUsed)) : null, resetAt: weeklyReset }
   };
 }
 
@@ -73,7 +73,7 @@ function fetchClaudeProvider() {
     const runnerPath = getRunnerPath();
     const runnerDir = path.dirname(runnerPath);
 
-    execFile('python', [runnerPath], { cwd: runnerDir }, (err, stdout) => {
+    execFile('python', [runnerPath], { cwd: runnerDir, timeout: 15000, windowsHide: true }, (err, stdout) => {
       if (err || !stdout) {
         resolve(envelope('error', {}, SOURCE, err ? err.message : 'Empty runner output'));
         return;

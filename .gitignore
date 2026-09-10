@@ -27,3 +27,6 @@ widget-debug.log
 
 # Cloud bot runtime state
 cloud-bot/state.json
+
+# Archived local backups and obsolete packages
+archive/

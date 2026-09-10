@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const WebSocket = require('ws');
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 
 const SOURCE = 'antigravity_devtools';
 
@@ -35,7 +35,7 @@ async function fetchRaw() {
 
   let res;
   try {
-    res = await fetch(`http://127.0.0.1:${port}/json/list`);
+    res = await fetch(`http://127.0.0.1:${port}/json/list`, { signal: AbortSignal.timeout(5000) });
   } catch (e) {
     throw new Error(`DevTools HTTP connect failed (${e.message})`);
   }
@@ -88,14 +88,21 @@ async function fetchRaw() {
 
   let apiRes;
   try {
-    apiRes = await fetch(`https://127.0.0.1:${apiPort}/exa.language_server_pb.LanguageServerService/GetUserStatus`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'connect-protocol-version': '1',
-        'x-codeium-csrf-token': csrfToken.csrf
-      },
-      body: JSON.stringify({})
+    // Only this loopback service uses Antigravity's self-signed certificate.
+    apiRes = await new Promise((resolve,reject)=>{
+      const request=require('https').request({
+        hostname:'127.0.0.1',port:apiPort,
+        path:'/exa.language_server_pb.LanguageServerService/RetrieveUserQuotaSummary',
+        method:'POST',rejectUnauthorized:false,
+        headers:{'Content-Type':'application/json','connect-protocol-version':'1','x-codeium-csrf-token':csrfToken.csrf}
+      },response=>{
+        let body='';response.setEncoding('utf8');
+        response.on('data',chunk=>body+=chunk);
+        response.on('end',()=>resolve({ok:response.statusCode>=200&&response.statusCode<300,status:response.statusCode,json:async()=>JSON.parse(body)}));
+        response.on('error',reject);
+      });
+      request.setTimeout(8000,()=>request.destroy(new Error('Local quota request timed out')));
+      request.on('error',reject);request.end('{}');
     });
   } catch (e) {
     throw new Error(`API fetch failed (${e.message})`);
@@ -103,39 +110,56 @@ async function fetchRaw() {
 
   if (!apiRes.ok) throw new Error(`API ${apiRes.status}`);
   const statusData = await apiRes.json();
-  const models = (statusData.userStatus && statusData.userStatus.cascadeModelConfigData && statusData.userStatus.cascadeModelConfigData.clientModelConfigs) || [];
-  if (models.length === 0) throw new Error('No Antigravity models returned');
+  const groups = (statusData.response && statusData.response.groups) || [];
+  if (groups.length === 0) throw new Error('No Antigravity quota groups returned');
 
   let geminiSession = null;
   let geminiSessionReset = '';
+  let geminiWeekly = null;
+  let geminiWeeklyReset = '';
+
   let claudeSession = null;
   let claudeSessionReset = '';
+  let claudeWeekly = null;
+  let claudeWeeklyReset = '';
 
-  for (const m of models) {
-    const id = (m.modelId || '').toLowerCase();
-    const label = (m.label || '').toLowerCase();
-    const q = m.quotaInfo;
-    if (!q) continue;
+  for (const g of groups) {
+    const isGemini = (g.displayName || '').toLowerCase().includes('gemini');
+    const buckets = g.buckets || [];
+    for (const b of buckets) {
+      if(!Number.isFinite(b.remainingFraction)) continue;
+      const pct = Math.max(0,Math.min(100,Math.round(b.remainingFraction * 100)));
+      const isWeekly = b.window === 'weekly';
 
-    const frac = q.remainingFraction !== undefined ? q.remainingFraction : (q.remainingPercentage !== undefined ? q.remainingPercentage / 100 : (q.resetTime ? 0 : 1));
-    const remainingPct = Math.round(frac * 100);
-
-    if (id.includes('gemini') || label.includes('gemini')) {
-      if (id.includes('gemini-3.6-flash-low') || id.includes('gemini-3.6-flash') || geminiSession === null || remainingPct < geminiSession) {
-        geminiSession = remainingPct;
-        if (q.resetTime) geminiSessionReset = q.resetTime;
-      }
-    } else if (id.includes('claude') || id.includes('gpt') || label.includes('claude') || label.includes('gpt')) {
-      if (id.includes('claude-sonnet-4-6') || claudeSession === null || remainingPct < claudeSession) {
-        claudeSession = remainingPct;
-        if (q.resetTime) claudeSessionReset = q.resetTime;
+      if (isGemini) {
+        if (isWeekly) {
+          geminiWeekly = pct;
+          geminiWeeklyReset = b.resetTime;
+        } else {
+          geminiSession = pct;
+          geminiSessionReset = b.resetTime;
+        }
+      } else {
+        if (isWeekly) {
+          claudeWeekly = pct;
+          claudeWeeklyReset = b.resetTime;
+        } else {
+          claudeSession = pct;
+          claudeSessionReset = b.resetTime;
+        }
       }
     }
   }
 
   return {
-    gemini: { session: geminiSession !== null ? geminiSession : 100, sessionReset: geminiSessionReset },
-    claudeGpt: { session: claudeSession !== null ? claudeSession : 0, sessionReset: claudeSessionReset }
+    gemini: {
+      session: geminiSession, sessionReset: geminiSessionReset,
+      weekly: geminiWeekly, weeklyReset: geminiWeeklyReset
+    },
+    claudeGpt: {
+      session: claudeSession, sessionReset: claudeSessionReset,
+      weekly: claudeWeekly, weeklyReset: claudeWeeklyReset
+    }
   };
 }
 
@@ -144,10 +168,12 @@ async function fetchAntigravityProviders() {
     const raw = await fetchRaw();
     return {
       antigravity_gemini: envelope('antigravity_gemini', 'ok', {
-        session: { remaining: raw.gemini.session, resetAt: raw.gemini.sessionReset }
+        session: { remaining: raw.gemini.session, resetAt: raw.gemini.sessionReset },
+        weekly: { remaining: raw.gemini.weekly, resetAt: raw.gemini.weeklyReset }
       }, null),
       antigravity_claude_gpt: envelope('antigravity_claude_gpt', 'ok', {
-        session: { remaining: raw.claudeGpt.session, resetAt: raw.claudeGpt.sessionReset }
+        session: { remaining: raw.claudeGpt.session, resetAt: raw.claudeGpt.sessionReset },
+        weekly: { remaining: raw.claudeGpt.weekly, resetAt: raw.claudeGpt.weeklyReset }
       }, null)
     };
   } catch (e) {

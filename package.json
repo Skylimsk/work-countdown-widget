@@ -1,11 +1,15 @@
 {
   "name": "work-countdown-widget",
-  "version": "2.1.5",
-  "description": "A sleek, floating desktop widget counting down to your work end time.",
-  "main": "main.js",
+  "version": "3.0.0",
+  "description": "Workday desktop widget with adaptive AI cards, Caffeine and Spotify fan themes",
+  "main": "src/main.js",
   "scripts": {
     "start": "electron .",
-    "build": "electron-builder --win dir"
+    "build": "node scripts/build.js",
+    "test": "node --test tests/*.test.js",
+    "build:installer": "npm run build && node scripts/build-installer.js",
+    "obfuscate": "node scripts/obfuscate.js",
+    "test:ui": "node scripts/run-smoke.js"
   },
   "keywords": [
     "countdown",
@@ -27,24 +31,18 @@
     "productName": "WorkCountdownWidget",
     "win": {
       "target": "dir",
-      "icon": "icon.png"
+      "icon": "src/icon.png",
+      "signAndEditExecutable": false
     },
     "files": [
-      "main.js",
-      "renderer.js",
-      "store.js",
-      "spotifyService.js",
-      "spotifyAuth.js",
-      "spotify_now_playing.py",
-      "quotaService.js",
-      "telegramBotService.js",
-      "providers/**/*",
-      "runner.py",
-      "claude_usage.py",
-      "index.html",
-      "style.css",
-      "icon.png"
-    ]
+      "src/**/*",
+      "!src/**/__pycache__/**",
+      "!src/**/*.pyc",
+      "!src/**/*.bak",
+      "!src/**/*.tmp"
+    ],
+    "asar": false,
+    "afterPack": "scripts/after-pack.js"
   },
   "dependencies": {
     "node-telegram-bot-api": "^1.2.0",

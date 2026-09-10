@@ -1,6 +1,6 @@
 /**
  * obfuscate.js — Run before packaging to protect source code.
- * Usage: node obfuscate.js
+ * Usage: npm run obfuscate
  * Obfuscates all app JS files into ./obfuscated/ folder, which is then packaged.
  */
 const JavaScriptObfuscator = require('javascript-obfuscator');
@@ -38,7 +38,10 @@ const OBFUSCATE_OPTIONS = {
   unicodeEscapeSequence: false,
 };
 
-const srcDir = __dirname;
+const srcDir = path.join(__dirname, '..', 'src');
+const outDir = path.join(__dirname, '..', 'dist', 'obfuscated');
+fs.mkdirSync(outDir, { recursive: true });
+fs.cpSync(srcDir, outDir, { recursive: true });
 
 console.log('🔐 Obfuscating source files...');
 
@@ -50,10 +53,9 @@ FILES_TO_OBFUSCATE.forEach(file => {
   }
   const src = fs.readFileSync(srcPath, 'utf-8');
   const result = JavaScriptObfuscator.obfuscate(src, OBFUSCATE_OPTIONS);
-  fs.writeFileSync(srcPath + '.bak', src, 'utf-8'); // keep backup
-  fs.writeFileSync(srcPath, result.getObfuscatedCode(), 'utf-8');
+  fs.writeFileSync(path.join(outDir, file), result.getObfuscatedCode(), 'utf-8');
   console.log(`  ✅ Obfuscated: ${file}`);
 });
 
-console.log('\n✅ All files obfuscated. Run packager now.');
-console.log('💡 To restore originals: rename .js.bak files back to .js');
+console.log('\n✅ Obfuscated copy written to dist/obfuscated. Source files unchanged.');
+console.log('💡 Normal builds continue to use src/.');
