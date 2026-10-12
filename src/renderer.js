@@ -17,6 +17,17 @@ function configure(){
 }
 function element(tag,cls,text){const el=document.createElement(tag);if(cls)el.className=cls;if(text!==undefined)el.textContent=text;return el;}
 function resetText(iso){if(!iso)return 'Reset time unavailable';const d=new Date(iso);if(!Number.isFinite(d.getTime()))return 'Reset time unavailable';const minutes=Math.ceil((d-Date.now())/60000);return (minutes<=0?'Resetting…':'Resets '+d.toLocaleString('en-GB',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}));}
+function codexMetricLabel(key,m){
+ if(m?.name)return m.name;
+ const mins=m?.windowDurationMins;
+ if(Number.isFinite(mins)&&mins>0){
+  if(mins%10080===0)return (mins/10080===1?'Weekly':mins/10080+'-week')+' limit';
+  if(mins%1440===0)return (mins/1440===1?'Daily':mins/1440+'-day')+' limit';
+  if(mins%60===0)return (mins/60===1?'Hourly':mins/60+'-hour')+' limit';
+  return mins+'-minute limit';
+ }
+ return ({session:'Current limit',weekly:'Weekly limit'})[key]||key.replace(/([A-Z])/g,' $1').replace(/[_-]+/g,' ').replace(/^./,s=>s.toUpperCase())+' limit';
+}
 function metric(parent,label,m,cached){
  const row=element('div','quota-metric'),head=element('div','quota-label');
  const valid=Number.isFinite(m?.remaining);head.append(element('span','',label),element('span','remaining',valid?Math.round(m.remaining)+'%':'—'));
@@ -38,9 +49,16 @@ function renderAI(){
    const p=state.snapshot.providers?.[key];if(name)card.append(element('div','model-label',name));
    if(!p){card.append(element('p','provider-error','Reading local account…'));continue;}
    if(p.status!=='ok'&&!p.lastKnownGoodAt){const msg=p.status==='not_authenticated'?'Open the app and sign in first':p.error||'Usage is temporarily unavailable';card.append(element('p','provider-error',msg));continue;}
-   const mins=p.metrics?.session?.windowDurationMins;
-   metric(card,id==='antigravity'?'Current left':(mins?mins%60===0?mins/60+'h left':mins+'m left':'5h left'),p.metrics?.session,p.lastKnownGoodAt);
-   if(c.showWeekly&&id!=='antigravity')metric(card,'Weekly left',p.metrics?.weekly,p.lastKnownGoodAt);
+   if(id==='codex'){
+    for(const [metricKey,value] of Object.entries(p.metrics||{})){
+     if(metricKey==='weekly'&&!c.showWeekly)continue;
+     metric(card,codexMetricLabel(metricKey,value),value,p.lastKnownGoodAt);
+    }
+   }else{
+    const mins=p.metrics?.session?.windowDurationMins;
+    metric(card,id==='antigravity'?'Current left':(mins?mins%60===0?mins/60+'h left':mins+'m left':'Current left'),p.metrics?.session,p.lastKnownGoodAt);
+    if(c.showWeekly&&id!=='antigravity')metric(card,'Weekly left',p.metrics?.weekly,p.lastKnownGoodAt);
+   }
 
   }
   root.append(card);

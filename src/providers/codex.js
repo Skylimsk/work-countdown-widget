@@ -19,12 +19,19 @@ function envelope(status, metrics = {}, error = null) {
     updatedAt: new Date().toISOString(), source: 'codex_app_server', error };
 }
 function normalize(result) {
-  const bucket = result.rateLimitsByLimitId ? result.rateLimitsByLimitId.codex : result.rateLimits;
+  const buckets = result.rateLimitsByLimitId;
+  // Newer account plans can expose a different limit id. Prefer Codex, but
+  // accept the unambiguous single-bucket response used by some account types.
+  const bucket = buckets?.codex || (buckets && Object.keys(buckets).length === 1
+    ? Object.values(buckets)[0]
+    : result.rateLimits);
   const metrics = {};
-  for (const [key, window] of [['session', bucket?.primary], ['weekly', bucket?.secondary]]) {
+  for (const [key, window] of Object.entries(bucket || {})) {
     if (!window || !Number.isFinite(window.usedPercent)) continue;
     const reset = Number.isFinite(window.resetsAt) ? new Date(window.resetsAt * 1000) : null;
-    metrics[key] = {
+    const metricKey = ({ primary: 'session', secondary: 'weekly' })[key] || key;
+    metrics[metricKey] = {
+      name: window.limitName || window.name || null,
       remaining: Math.round(Math.max(0, Math.min(100, 100 - window.usedPercent))),
       usedPercent: window.usedPercent,
       windowDurationMins: window.windowDurationMins,

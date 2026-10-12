@@ -64,7 +64,7 @@ npm run test:ui runs Electron in an isolated temporary profile with sample quota
 
 Old preferences are backed up to user-config.json.v2-backup when migrated. Widget service credentials use OS safeStorage encryption when available. Exported settings exclude credentials. Settings and diagnostics remain local.
 
-Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex card shows Codex account limits, not ordinary ChatGPT conversation counts.
+Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex / ChatGPT card shows the account's Codex limits, not ordinary ChatGPT conversation counts. It reads the actual limit windows returned for the signed-in account, so durations can vary by subscription (including ChatGPT Go) rather than assuming a fixed five-hour window.
 
 TWICE color references: JYP's September 23, 2016 official notice specifies Apricot (Pantone 712C) and Neon Magenta (Pantone 812C), used together: https://twice.jype.com/Mobile/NoticeView?AnSeq=5676&NoticeNumber=31 . Member color families follow https://www.oricon.co.jp/special/69842/ : Nayeon sky blue, Jeongyeon yellow-green, Momo pink, Sana purple, Jihyo orange, Mina mint green, Dahyun white, Chaeyoung red, Tzuyu blue. RGB values are screen approximations, not a claimed official member HEX specification. Theme changes preserve accent hues; text/backgrounds provide readability.
 

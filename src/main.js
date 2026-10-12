@@ -30,7 +30,18 @@ function applyConfig(){
  const c=loadConfig();nativeTheme.themeSource=c.theme;
  mainWindow?.setAlwaysOnTop(c.alwaysOnTop);mainWindow?.setOpacity(c.opacity);
  if(mainWindow){const [w,h]=mainWindow.getSize();if(w!==c.width)mainWindow.setSize(Math.round(c.width),h);}
- if(!smokeDir)app.setLoginItemSettings({openAtLogin:c.autoStart,name:'WorkCountdownWidget',path:process.execPath,args:app.isPackaged?[]:[app.getAppPath()]});
+ if(!smokeDir){
+  // Squirrel installs each version into a versioned app-* directory. Register
+  // its stable Update.exe launcher so auto-start survives app updates.
+  const updateExe=path.resolve(path.dirname(process.execPath),'..','Update.exe');
+  const squirrelInstalled=app.isPackaged&&fs.existsSync(updateExe);
+  app.setLoginItemSettings({
+   openAtLogin:c.autoStart,
+   name:'WorkCountdownWidget',
+   path:squirrelInstalled?updateExe:process.execPath,
+   args:squirrelInstalled?['--processStart',path.basename(process.execPath)]:app.isPackaged?[]:[app.getAppPath()]
+  });
+ }
  caffeine.configure(c);emitState();updateTray();updateBot();
 }
 function updateTray(){if(!tray)return;tray.setContextMenu(Menu.buildFromTemplate([
