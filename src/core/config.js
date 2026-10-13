@@ -20,7 +20,7 @@ function normalizeConfig(input = {}) {
   c.schemaVersion = 3;
   const choice = (key, values) => { if (!values.includes(c[key])) c[key] = defaults[key]; };
   choice('theme', ['system','dark','light']); choice('layout', ['standard','compact','music']);
-  choice('aiLayout',['carousel']); choice('caffeineMode',['system','display']);
+  choice('aiLayout',['carousel']); choice('caffeineMode',['system','display','activity']);
   choice('caffeineDuration',['manual','30','60','120','workday']); choice('salaryType',['hourly','monthly']);
   choice('currency',['MYR','USD','SGD','TWD','CNY']);
   for (const key of ['startTime','endTime','lunchStart','lunchEnd']) {

@@ -71,11 +71,15 @@ function jiggle(){return new Promise((resolve,reject)=>{
  const cmd='Add-Type -AssemblyName System.Windows.Forms; $widgetCursor=[System.Windows.Forms.Cursor]::Position; [System.Windows.Forms.Cursor]::Position=New-Object System.Drawing.Point(($widgetCursor.X+1),$widgetCursor.Y); Start-Sleep -Milliseconds 80; $widgetCursorNow=[System.Windows.Forms.Cursor]::Position; if (($widgetCursorNow.X -eq ($widgetCursor.X+1)) -and ($widgetCursorNow.Y -eq $widgetCursor.Y)) {[System.Windows.Forms.Cursor]::Position=$widgetCursor}';
  execFile('powershell.exe',['-NoProfile','-NonInteractive','-Command',cmd],{timeout:4000,windowsHide:true},err=>err?reject(err):resolve());
 });}
+function activityPulse(){return new Promise((resolve,reject)=>{
+ const cmd="Add-Type -TypeDefinition 'using System; using System.Runtime.InteropServices; public static class CaffeineKeyPulse { [DllImport(\"user32.dll\")] public static extern void keybd_event(byte vk, byte scan, uint flags, UIntPtr extra); }'; [CaffeineKeyPulse]::keybd_event(0x7E,0,0x0002,[UIntPtr]::Zero)";
+ execFile('powershell.exe',['-NoProfile','-NonInteractive','-Command',cmd],{timeout:4000,windowsHide:true},err=>err?reject(err):resolve());
+});}
 const caffeine=new Caffeine(powerSaveBlocker,jiggle,state=>{
  caffeineState=state;broadcast('caffeine-state',state);
  if(!state.enabled&&loadConfig().enableKeepAwake)saveConfig({enableKeepAwake:false});
  if(lastCaffeineEnabled!==state.enabled){lastCaffeineEnabled=state.enabled;updateTray();}
-});
+},Date.now,activityPulse);
 async function refreshQuota(){
  if(quotaBusy)return;
  quotaBusy=true;
