@@ -6,7 +6,7 @@ const defaults = {
   monthlySalary: 3000, workDaysPerMonth: 22, workHoursPerDay: 8, otMultiplier: 1.5, currency: 'MYR',
   showQuota: true, showWeekly: true, aiModes: { codex: 'auto', antigravity: 'auto', claude: 'auto' },
   aiOrder: ['codex','antigravity','claude'], collapsedAI: [], quotaRefresh: 60,
-  enableKeepAwake: false, caffeineMode: 'display', caffeineDuration: 'workday',
+  enableKeepAwake: false, autoCaffeineWorkday: true, caffeineMode: 'display', caffeineDuration: 'workday',
   mouseJiggle: false, jiggleMinutes: 3, pauseOnLock: true, pauseOnBattery: false,
   showSpotify: true, artistThemes: true, fanEffects: true, reduceMotion: false,
   restMinutes: 30, enableRest: true, enableTelegramBot: false, telegramCloudMode: false,

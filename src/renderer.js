@@ -70,7 +70,7 @@ function renderAI(){
 function renderCaffeine(){
  const c=state.caffeine||{};$('caffeineToggle').setAttribute('aria-pressed',String(!!c.enabled));
  $('caffeineLabel').textContent=c.error?'Caffeine needs attention':!c.enabled?'Caffeine off':!c.active?'Caffeine paused':c.mode==='system'?'System awake':c.mode==='activity'?'Screen saver blocked':'Display awake';
- $('caffeineDetail').textContent=c.error?'Check settings':c.enabled?(c.deadline?'Until '+new Date(c.deadline).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'Until switched off'):'Click to enable';
+ $('caffeineDetail').textContent=c.error?'Check settings':c.enabled?(c.scheduled?'Work hours · until '+new Date(c.deadline).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):c.deadline?'Until '+new Date(c.deadline).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}):'Until switched off'):'Click to enable';
  $('caffeineToggle').title=c.error||'Toggle Caffeine';
  $('headerCaffeine').setAttribute('aria-pressed',String(!!c.enabled));
  $('headerCaffeine').title=$('caffeineLabel').textContent+' · '+$('caffeineDetail').textContent;

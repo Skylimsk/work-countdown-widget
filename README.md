@@ -15,7 +15,7 @@ Open **Settings** from the gear button or tray menu. Save to apply changes.
 
 ## Caffeine
 
-System-only or system-and-display keep-awake modes use Electron powerSaveBlocker. The optional activity mode also sends an F15 key-up every 59 seconds to prevent the screen saver and idle lock, matching Caffeine's default behavior. Choose 30/60/120 minutes, end of the current shift, or manual stop. Lock-screen and battery pauses are configurable. Expiry and exit release the OS request.
+System-only or system-and-display keep-awake modes use Electron powerSaveBlocker. Caffeine automatically turns on at the start of configured work hours (also when the widget starts during a shift) and turns off at the end; this can be disabled in Settings. The optional activity mode also sends an F15 key-up every 59 seconds to prevent the screen saver and idle lock, matching Caffeine's default behavior. Choose 30/60/120 minutes or manual stop for manual activation. Lock-screen and battery pauses are configurable. Expiry and exit release the OS request.
 
 Mouse movement is independent and disabled by default. It runs asynchronously and does not restore the cursor if you have moved it meanwhile. Keeping the system awake does not guarantee online status in Teams or other chat apps.
 

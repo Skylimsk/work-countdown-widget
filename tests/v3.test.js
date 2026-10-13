@@ -34,6 +34,26 @@ test('Caffeine creates one real blocker, pauses, resumes and releases on expiry'
  clock+=31*60000;cf.reconcile();assert.equal(cf.status().enabled,false);assert.equal(live.size,0);
  cf.configure({...c,caffeineDuration:'manual'},true);assert.equal(live.size,1);cf.dispose();assert.equal(live.size,0);
 });
+test('Caffeine auto-starts within work hours and stops at shift end',()=>{
+ let clock=new Date(2026,9,12,8,59).getTime(),sequence=0;const live=new Set();
+ const blocker={start:()=>{live.add(++sequence);return sequence;},stop:id=>live.delete(id),isStarted:id=>live.has(id)};
+ const c=normalizeConfig({schemaVersion:3,enableKeepAwake:false,autoCaffeineWorkday:true,startTime:'09:00',endTime:'18:00',enableLunch:true,lunchStart:'12:00',lunchEnd:'13:00'});
+ const cf=new Caffeine(blocker,()=>{},()=>{},()=>clock);cf.configure(c);
+ assert.equal(cf.status().enabled,false);
+ clock=new Date(2026,9,12,9,0).getTime();cf.reconcile();
+ assert.equal(cf.status().enabled,true);assert.equal(cf.status().scheduled,true);
+ clock=new Date(2026,9,12,12,30).getTime();cf.reconcile();assert.equal(cf.status().enabled,true);
+ clock=new Date(2026,9,12,18,0).getTime();cf.reconcile();
+ assert.equal(cf.status().enabled,false);assert.equal(cf.status().scheduled,false);
+});
+test('Caffeine auto-starts when the widget opens during a shift',()=>{
+ let clock=new Date(2026,9,12,10,0).getTime(),sequence=0;const live=new Set();
+ const blocker={start:()=>{live.add(++sequence);return sequence;},stop:id=>live.delete(id),isStarted:id=>live.has(id)};
+ const c=normalizeConfig({schemaVersion:3,enableKeepAwake:false,autoCaffeineWorkday:true,startTime:'09:00',endTime:'18:00'});
+ const cf=new Caffeine(blocker,()=>{},()=>{},()=>clock);cf.configure(c);
+ assert.equal(cf.status().enabled,true);assert.equal(cf.status().scheduled,true);
+ assert.equal(cf.status().deadline,new Date(2026,9,12,18,0).getTime());
+});
 test('settings bounds and invalid provider modes cannot corrupt layout',()=>{
  const c=normalizeConfig({schemaVersion:3,carouselVersion:1,width:10000,theme:'invalid',aiModes:{codex:'invalid'},quotaRefresh:0});
  assert.equal(c.width,500);assert.equal(c.theme,'system');assert.equal(c.aiModes.codex,'auto');assert.equal(c.quotaRefresh,15);

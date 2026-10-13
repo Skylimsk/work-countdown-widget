@@ -16,7 +16,7 @@ const sections=[
  ['workDaysPerMonth','Workdays per month','number',1,31],['workHoursPerDay','Work hours per day','number',1,24,0.5],
  ['otMultiplier','Overtime multiplier','number',1,10,0.1],['currency','Currency','select',['MYR','USD','SGD','TWD','CNY']]]],
  ['caffeine','Caffeine','Choose whether to prevent sleep only or also simulate activity to prevent the screen saver and idle lock. Outside work hours, choose a duration instead of end of shift.',[
- ['enableKeepAwake','Enable Caffeine','checkbox'],['caffeineMode','Keep-awake mode','select',[['system','System only · screen may sleep'],['display','System and display'],['activity','System + display + prevent idle lock (F15 every 59 sec)']]],
+ ['enableKeepAwake','Enable Caffeine manually','checkbox'],['autoCaffeineWorkday','Auto-enable during work hours','checkbox'],['caffeineMode','Keep-awake mode','select',[['system','System only · screen may sleep'],['display','System and display'],['activity','System + display + prevent idle lock (F15 every 59 sec)']]],
  ['caffeineDuration','Stop automatically','select',[['workday','At the end of this shift'],['30','After 30 minutes'],['60','After 1 hour'],['120','After 2 hours'],['manual','Until switched off']]],
  ['pauseOnLock','Pause when locked','checkbox'],['pauseOnBattery','Pause on battery','checkbox'],
  ['mouseJiggle','Mouse movement','checkbox'],['jiggleMinutes','Movement interval (min)','number',1,30]]],
