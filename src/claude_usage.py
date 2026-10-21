@@ -32,6 +32,13 @@ class DATA_BLOB(ctypes.Structure):
 
 def find_claude_data_dir() -> Path | None:
     candidates: list[Path] = []
+    # Newer Claude Desktop (MSIX) builds keep their data under
+    # %LOCALAPPDATA%\Claude-Data\<package id> instead of the package's
+    # LocalCache\Roaming\Claude folder.
+    claude_data = Path(os.path.expandvars(r"%LOCALAPPDATA%\Claude-Data"))
+    if claude_data.exists():
+        candidates.extend(sorted(claude_data.glob("claude_*")))
+        candidates.append(claude_data)
     local_packages = Path(os.path.expandvars(r"%LOCALAPPDATA%\Packages"))
     if local_packages.exists():
         candidates.extend(
@@ -130,25 +137,43 @@ def _load_desktop_oauth_cache(data_dir: Path) -> list[dict]:
     return []
 
 
+def _is_expired(expires_at) -> bool:
+    try:
+        return float(expires_at) <= datetime.now().timestamp() * 1000
+    except (TypeError, ValueError):
+        return False
+
+
 def get_all_candidate_tokens() -> list[str]:
-    tokens = []
+    """Unexpired tokens, freshest first. Expired tokens only produce 401s and
+    burn requests against the rate-limited usage endpoint, so skip them."""
+    # (has refresh token, expiry, token): desktop entries without a refresh
+    # token are narrow-scope tokens that the usage endpoint rejects with 403.
+    found: list[tuple[bool, float, str]] = []
     data_dir = find_claude_data_dir()
     if data_dir:
         for entry in _load_desktop_oauth_cache(data_dir):
             if isinstance(entry, dict):
                 t = entry.get("token") or entry.get("accessToken")
-                if t and t not in tokens:
-                    tokens.append(t)
+                exp = entry.get("expiresAt")
+                if t and not _is_expired(exp):
+                    found.append((bool(entry.get("refreshToken")), float(exp or 0), t))
 
     if HOME_CREDENTIALS.exists():
         try:
             data = json.loads(HOME_CREDENTIALS.read_text(encoding="utf-8"))
             oauth = data.get("claudeAiOauth") or {}
             t = oauth.get("accessToken")
-            if t and t not in tokens:
-                tokens.append(t)
+            exp = oauth.get("expiresAt")
+            if t and not _is_expired(exp):
+                found.append((True, float(exp or 0), t))
         except Exception:
             pass
+
+    tokens: list[str] = []
+    for _, _, t in sorted(found, key=lambda item: item[:2], reverse=True):
+        if t not in tokens:
+            tokens.append(t)
     return tokens
 
 
@@ -197,7 +222,7 @@ def fetch_claude_usage() -> dict:
             "usage": None,
             "account": account,
             "status": "not_authenticated",
-            "error": "No Claude OAuth token found.",
+            "error": "No valid Claude sign-in found. Open Claude Desktop or run `claude` to sign in again.",
         }
 
     last_err = None
@@ -206,6 +231,12 @@ def fetch_claude_usage() -> dict:
             usage = _request_usage(token)
             if usage:
                 return {"usage": usage, "account": account, "status": "ok", "error": None}
+        except urllib.error.HTTPError as exc:
+            last_err = exc
+            # Rate limits apply per account, so trying other tokens only
+            # prolongs the 429. Bad/under-scoped tokens: try the next one.
+            if exc.code == 429:
+                break
         except Exception as exc:
             last_err = exc
 

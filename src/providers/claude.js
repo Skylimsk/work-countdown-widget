@@ -4,6 +4,12 @@ const fs = require('fs');
 
 const PROVIDER_ID = 'claude';
 const SOURCE = 'anthropic_oauth_api';
+// Claude's OAuth usage endpoint is rate limited. The widget refreshes all
+// providers more often than this endpoint should be polled, so cache Claude
+// independently of the global refresh interval.
+const MIN_REFRESH_MS = 5 * 60 * 1000;
+let lastAttemptAt = 0;
+let lastResult = null;
 
 function getRunnerPath() {
   const candidates = [
@@ -69,13 +75,23 @@ function parseUsage(parsed) {
 // Fetches quota purely based on OAuth credential availability — never gated on
 // whether the Claude.exe process happens to be running.
 function fetchClaudeProvider() {
+  const now = Date.now();
+  if (lastResult && now - lastAttemptAt < MIN_REFRESH_MS) {
+    if (lastResult.status === 'ok') {
+      return Promise.resolve({ ...lastResult, status: 'cached' });
+    }
+    return Promise.resolve(lastResult);
+  }
+
   return new Promise((resolve) => {
     const runnerPath = getRunnerPath();
     const runnerDir = path.dirname(runnerPath);
 
     execFile('python', [runnerPath], { cwd: runnerDir, timeout: 15000, windowsHide: true }, (err, stdout) => {
       if (err || !stdout) {
-        resolve(envelope('error', {}, SOURCE, err ? err.message : 'Empty runner output'));
+        lastAttemptAt = Date.now();
+        lastResult = envelope('error', {}, SOURCE, err ? err.message : 'Empty runner output');
+        resolve(lastResult);
         return;
       }
 
@@ -83,21 +99,32 @@ function fetchClaudeProvider() {
       try {
         parsed = JSON.parse(stdout.trim());
       } catch (e) {
-        resolve(envelope('error', {}, SOURCE, `Failed to parse runner output: ${e.message}`));
+        lastAttemptAt = Date.now();
+        lastResult = envelope('error', {}, SOURCE, `Failed to parse runner output: ${e.message}`);
+        resolve(lastResult);
         return;
       }
 
       if (parsed.status === 'not_authenticated') {
-        resolve(envelope('not_authenticated', {}, SOURCE, parsed.error));
+        lastAttemptAt = Date.now();
+        lastResult = envelope('not_authenticated', {}, SOURCE, parsed.error);
+        resolve(lastResult);
         return;
       }
 
       if (parsed.status !== 'ok' || !parsed.usage) {
-        resolve(envelope('error', {}, SOURCE, parsed.error || 'Unknown Claude usage error'));
+        lastAttemptAt = Date.now();
+        const message = parsed.error || 'Unknown Claude usage error';
+        lastResult = envelope('error', {}, SOURCE, /429|too many requests/i.test(message)
+          ? 'Claude is rate limiting usage checks. Try again in a few minutes.'
+          : message);
+        resolve(lastResult);
         return;
       }
 
-      resolve(envelope('ok', parseUsage(parsed), SOURCE, null));
+      lastAttemptAt = Date.now();
+      lastResult = envelope('ok', parseUsage(parsed), SOURCE, null);
+      resolve(lastResult);
     });
   });
 }
