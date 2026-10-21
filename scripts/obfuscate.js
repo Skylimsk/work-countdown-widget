@@ -12,7 +12,6 @@ const FILES_TO_OBFUSCATE = [
   'renderer.js',
   'store.js',
   'quotaService.js',
-  'telegramBotService.js',
   'spotifyService.js',
   'spotifyAuth.js',
 ];

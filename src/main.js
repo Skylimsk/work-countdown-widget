@@ -17,8 +17,6 @@ const {getSpotifyNowPlaying,spotifyPlayPause,spotifyNext,spotifyPrev}=require('.
 const spotifyAuth=require('./spotifyAuth');
 let mainWindow,settingsWindow,playlistWindow,tray,quitting=false,scanPending=false,quotaBusy=false,quotaAt=0;
 let snapshot={providers:{}},activeApps={},caffeineState={},moveTimer,restAt=Date.now(),lastCaffeineEnabled;
-let botStarted=false,botUpdate=Promise.resolve();
-function updateBot(){if(smokeDir)return;botUpdate=botUpdate.then(async()=>{const c=loadConfig(),bot=require('./telegramBotService');const wanted=c.enableTelegramBot&&!c.telegramCloudMode;if(botStarted&&!wanted){await bot.stopTelegramBot();botStarted=false;}if(!botStarted&&wanted){bot.initTelegramBot();botStarted=true;}bot.setBotActiveState(wanted);}).catch(e=>writeLog('Bot configuration error: '+e.message));}
 const smokeDir=process.env.WIDGET_SMOKE_DIR;
 if(smokeDir){app.setPath('userData',smokeDir);app.commandLine.appendSwitch('disable-gpu');}
 if(!app.requestSingleInstanceLock()){app.quit();process.exit(0);}
@@ -42,7 +40,7 @@ function applyConfig(){
    args:squirrelInstalled?['--processStart',path.basename(process.execPath)]:app.isPackaged?[]:[app.getAppPath()]
   });
  }
- caffeine.configure(c);emitState();updateTray();updateBot();
+ caffeine.configure(c);emitState();updateTray();
 }
 function updateTray(){if(!tray)return;tray.setContextMenu(Menu.buildFromTemplate([
  {label:'Spotify library',click:openPlaylists},{label:'Show widget',click:()=>mainWindow.show()},{label:'Settings',click:openSettings},
@@ -83,7 +81,7 @@ const caffeine=new Caffeine(powerSaveBlocker,jiggle,state=>{
 async function refreshQuota(){
  if(quotaBusy)return;
  quotaBusy=true;
- try{snapshot=await fetchClaudeQuota();quotaAt=Date.now();emitState();if(loadConfig().enableTelegramBot&&loadConfig().telegramCloudMode)require('./cloudSync').pushQuotaSnapshot(snapshot);}catch(e){writeLog('Quota error: '+e.message);}finally{quotaBusy=false;}
+ try{snapshot=await fetchClaudeQuota();quotaAt=Date.now();emitState();}catch(e){writeLog('Quota error: '+e.message);}finally{quotaBusy=false;}
 }
 function scanApps(){
  if(scanPending)return;scanPending=true;
@@ -140,7 +138,7 @@ app.whenReady().then(()=>{
  setInterval(()=>{const c=loadConfig();if(c.enableRest&&Date.now()-restAt>=c.restMinutes*60000&&!caffeine.locked){restAt=Date.now();new Notification({title:'Time for a break',body:'Stand up, stretch and rest your eyes for a minute.',silent:false}).show();}},30000);
  }
 });
-app.on('before-quit',()=>{quitting=true;clearTimeout(moveTimer);caffeine.dispose();if(botStarted)require('./telegramBotService').stopTelegramBot();});
+app.on('before-quit',()=>{quitting=true;clearTimeout(moveTimer);caffeine.dispose();});
 app.on('window-all-closed',()=>{if(!quitting)app.quit();});
 
 // Spotify IPC Handlers

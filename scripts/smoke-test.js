@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..'),out=path.join(root,'dist','verification');
 fs.mkdirSync(out,{recursive:true});
 process.env.WIDGET_SMOKE_DIR=fs.mkdtempSync(path.join(os.tmpdir(),'workday-v3-smoke-'));
 app.setPath('userData',process.env.WIDGET_SMOKE_DIR);
-fs.writeFileSync(path.join(process.env.WIDGET_SMOKE_DIR,'user-config.json'),JSON.stringify({schemaVersion:3,theme:'system',autoStart:false,enableKeepAwake:false,enableTelegramBot:false}));
+fs.writeFileSync(path.join(process.env.WIDGET_SMOKE_DIR,'user-config.json'),JSON.stringify({schemaVersion:3,theme:'system',autoStart:false,enableKeepAwake:false}));
 require('../src/main');
 const delay=ms=>new Promise(r=>setTimeout(r,ms));
 const errors=[];

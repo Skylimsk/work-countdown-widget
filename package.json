@@ -45,7 +45,6 @@
     "afterPack": "scripts/after-pack.js"
   },
   "dependencies": {
-    "node-telegram-bot-api": "^1.2.0",
     "ws": "^8.21.2"
   }
 }

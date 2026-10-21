@@ -9,7 +9,7 @@ const defaults = {
   enableKeepAwake: false, autoCaffeineWorkday: true, caffeineMode: 'display', caffeineDuration: 'workday',
   mouseJiggle: false, jiggleMinutes: 3, pauseOnLock: true, pauseOnBattery: false,
   showSpotify: true, artistThemes: true, fanEffects: true, reduceMotion: false,
-  restMinutes: 30, enableRest: true, enableTelegramBot: false, telegramCloudMode: false,
+  restMinutes: 30, enableRest: true,
   credentials: {}, x: null, y: null
 };
 function normalizeConfig(input = {}) {
@@ -17,6 +17,9 @@ function normalizeConfig(input = {}) {
   if (input.schemaVersion !== 3) { c.theme = 'system'; c.width = 260; c.mouseJiggle = false; }
   if (input.carouselVersion !== 1) { c.width = 260; c.layout = 'standard'; }
   c.carouselVersion = 1;
+  // Telegram bot support was removed; drop its old settings and cloud credentials.
+  delete c.enableTelegramBot; delete c.telegramCloudMode;
+  delete c.credentials.cloudSyncUrl; delete c.credentials.cloudSyncSecret;
   c.schemaVersion = 3;
   const choice = (key, values) => { if (!values.includes(c[key])) c[key] = defaults[key]; };
   choice('theme', ['system','dark','light']); choice('layout', ['standard','compact','music']);

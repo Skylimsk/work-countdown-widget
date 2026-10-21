@@ -31,9 +31,7 @@ const sections=[
  ['fanEffects','TWICE chant & song effects','checkbox']]],
  ['system','System & alerts','Startup, tray behavior and break reminders.',[
  ['autoStart','Launch at startup','checkbox'],['closeToTray','Close to system tray','checkbox'],
- ['enableRest','Break reminders','checkbox'],['restMinutes','Reminder interval (min)','number',5,180],
- ['enableTelegramBot','Enable existing Telegram bot','checkbox'],['telegramCloudMode','Use cloud bot','checkbox'],
- ['credentials.cloudSyncUrl','Cloud bot URL','text'],['credentials.cloudSyncSecret','Cloud shared secret','password']]],
+ ['enableRest','Break reminders','checkbox'],['restMinutes','Reminder interval (min)','number',5,180]]],
  ['diagnostics','Diagnostics & backup','Inspect connections and back up preferences. Exports exclude tokens and secrets.',[]]
 ];
 function value(key){return key.split('.').reduce((o,k)=>o?.[k],config);}

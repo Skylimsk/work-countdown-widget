@@ -75,16 +75,11 @@ npm run test:ui runs Electron in an isolated temporary profile with sample quota
       core/       Config validation, schedules, AI visibility and Caffeine
     scripts/      Packaging, icon editing and Electron integration tests
     tests/        Unit/regression tests
-    cloud-bot/    Standalone Telegram cloud bot (see cloud-bot/README.md)
     dist/         Build outputs and verification (generated, not committed)
 
 Old preferences are backed up to user-config.json.v2-backup when migrated. Widget service credentials use OS safeStorage encryption when available. Exported settings exclude credentials. Settings and diagnostics remain local.
 
 The Claude card reads the signed-in account's session (5-hour) and weekly limits from Anthropic's OAuth usage endpoint. It uses Claude Desktop's sign-in, found in `%LOCALAPPDATA%\Claude-Data\<package>` on current MSIX builds (older `%APPDATA%\Claude` and package `LocalCache` locations are still checked), then falls back to the Claude Code CLI sign-in in `~/.claude/.credentials.json`. Expired and narrow-scope tokens are skipped. The endpoint is rate limited, so Claude is checked at most once every five minutes regardless of the refresh interval, a 429 stops that check instead of retrying other tokens, and the last good reading is shown as cached in the meantime. If no valid sign-in is found, open Claude Desktop or run `claude` to sign in again.
-
-### Telegram quota bot
-
-System settings include **Use cloud bot**: the widget pushes each quota snapshot to the standalone bot in `cloud-bot/` (Cloud bot URL and shared secret are stored with the other credentials). See `cloud-bot/README.md` to deploy it. The older local-only **Enable existing Telegram bot** option currently does nothing, because its `telegramBotService.js` module is no longer in the repository; use cloud mode instead.
 
 Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex / ChatGPT card shows the account's Codex limits, not ordinary ChatGPT conversation counts. It reads the actual limit windows returned for the signed-in account, so durations can vary by subscription (including ChatGPT Go) rather than assuming a fixed five-hour window.
 
