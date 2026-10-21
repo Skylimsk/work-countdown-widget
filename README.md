@@ -1,6 +1,6 @@
 # Workday 3
 
-An English-language Windows desktop widget for work countdowns, a compact AI usage carousel, Caffeine and Spotify fan effects. YouTube is deferred.
+An English-language Windows desktop widget for workday countdowns and overtime pay, a compact AI usage carousel, Caffeine keep-awake, break reminders, and Spotify controls with TWICE fan effects. YouTube is deferred.
 
 ## Install
 
@@ -14,8 +14,21 @@ Open **Settings** from the gear button or tray menu. Save to apply changes.
 - AI cards support **Codex / ChatGPT**, **Antigravity**, and **Claude**. Each can follow its running desktop app, always show, or stay hidden.
 - Antigravity contains Gemini and Claude / GPT groups. Missing quota data is shown as unavailable; cached readings are labeled.
 - Click a card header to collapse it. Change card order and rotation interval in Settings.
-- The default width is 260px. One AI is visible at a time, rotating every 6 seconds. Hover to pause or use arrows/dots. Choose Clock only for an even smaller widget.
-- The minus button hides the widget to the tray. Use the tray menu to quit.
+- "Follow running app" shows a card only while its desktop app is open: Claude Desktop, ChatGPT or the Codex desktop app (Codex CLI helpers are ignored), and Antigravity.
+- The default width is 260px (230–500). One AI is visible at a time, rotating every 6 seconds by default (3–30). Hover to pause or use arrows/dots.
+- Widget layouts: **AI carousel** (default), **Clock only** for an even smaller widget, and **Music focus**.
+- Appearance also covers always on top, opacity, text scale and reduced motion. System settings cover launch at startup and close to tray.
+- The minus button hides the widget to the tray. The tray menu has Show widget, Settings, Spotify library, a Caffeine keep-awake toggle and Quit.
+
+## Workday countdown and overtime
+
+The clock counts down through three stages: **Start** (time until work starts), **Lunch** (time until lunch starts, then until it ends) and **Home** (time until the end of the shift), with a progress bar for the day. Configure work start/end, an optional lunch break and which weekdays are workdays. Times use your local time zone, and overnight shifts that end the next day are supported.
+
+With overtime tracking enabled, **Start overtime** appears outside working hours and shows the pay earned so far. Pay is calculated from either an hourly rate or a monthly salary divided by workdays per month × work hours per day, multiplied by the overtime multiplier (default 1.5×). Currencies: MYR, USD, SGD, TWD and CNY.
+
+## Break reminders
+
+When enabled, a Windows notification reminds you to stand up and rest your eyes every 30 minutes by default (5–180). Reminders are skipped while the screen is locked.
 
 ## Caffeine
 
@@ -52,7 +65,7 @@ System Python is required for the existing Claude/Spotify helpers. Resources are
 
 ## Verification
 
-npm test covers settings migration/validation, AI visibility, overnight shifts and Caffeine lifecycle behavior.
+npm test covers settings migration/validation and bounds, overnight shifts and countdown stages, Caffeine lifecycle and work-hours auto-start, Codex desktop-app detection, TWICE member parsing, and the Spotify playlist/Liked Songs/artist/queue services (using fake HTTP responses).
 
 npm run test:ui runs Electron in an isolated temporary profile with sample quotas. It checks three/single/no AI cards, system theme updates, carousel/clock-only layouts, English settings, settings saves, real OS keep-awake start/stop, Spotify content, TWICE timed roll call and effects-off behavior. Results/screenshots are written to dist/verification. No real account data is used by this test.
 
@@ -62,13 +75,16 @@ npm run test:ui runs Electron in an isolated temporary profile with sample quota
       core/       Config validation, schedules, AI visibility and Caffeine
     scripts/      Packaging, icon editing and Electron integration tests
     tests/        Unit/regression tests
-    cloud-bot/    Existing standalone cloud bot
-    dist/         Current build outputs and verification
-    archive/      Previous source/build backups
+    cloud-bot/    Standalone Telegram cloud bot (see cloud-bot/README.md)
+    dist/         Build outputs and verification (generated, not committed)
 
 Old preferences are backed up to user-config.json.v2-backup when migrated. Widget service credentials use OS safeStorage encryption when available. Exported settings exclude credentials. Settings and diagnostics remain local.
 
 The Claude card reads the signed-in account's session (5-hour) and weekly limits from Anthropic's OAuth usage endpoint. It uses Claude Desktop's sign-in, found in `%LOCALAPPDATA%\Claude-Data\<package>` on current MSIX builds (older `%APPDATA%\Claude` and package `LocalCache` locations are still checked), then falls back to the Claude Code CLI sign-in in `~/.claude/.credentials.json`. Expired and narrow-scope tokens are skipped. The endpoint is rate limited, so Claude is checked at most once every five minutes regardless of the refresh interval, a 429 stops that check instead of retrying other tokens, and the last good reading is shown as cached in the meantime. If no valid sign-in is found, open Claude Desktop or run `claude` to sign in again.
+
+### Telegram quota bot
+
+System settings include **Use cloud bot**: the widget pushes each quota snapshot to the standalone bot in `cloud-bot/` (Cloud bot URL and shared secret are stored with the other credentials). See `cloud-bot/README.md` to deploy it. The older local-only **Enable existing Telegram bot** option currently does nothing, because its `telegramBotService.js` module is no longer in the repository; use cloud mode instead.
 
 Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex / ChatGPT card shows the account's Codex limits, not ordinary ChatGPT conversation counts. It reads the actual limit windows returned for the signed-in account, so durations can vary by subscription (including ChatGPT Go) rather than assuming a fixed five-hour window.
 
