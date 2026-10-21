@@ -2,6 +2,10 @@
 
 An English-language Windows desktop widget for work countdowns, a compact AI usage carousel, Caffeine and Spotify fan effects. YouTube is deferred.
 
+## Install
+
+Download `WorkCountdownWidgetSetup.exe` from the latest release (https://github.com/Skylimsk/work-countdown-widget/releases/latest) and run it. Current version: 3.0.0. The installer is unsigned, so Windows SmartScreen may ask you to confirm. System Python is required for the Claude and Spotify helpers.
+
 ## Use
 
 Open **Settings** from the gear button or tray menu. Save to apply changes.
@@ -63,6 +67,8 @@ npm run test:ui runs Electron in an isolated temporary profile with sample quota
     archive/      Previous source/build backups
 
 Old preferences are backed up to user-config.json.v2-backup when migrated. Widget service credentials use OS safeStorage encryption when available. Exported settings exclude credentials. Settings and diagnostics remain local.
+
+The Claude card reads the signed-in account's session (5-hour) and weekly limits from Anthropic's OAuth usage endpoint. It uses Claude Desktop's sign-in, found in `%LOCALAPPDATA%\Claude-Data\<package>` on current MSIX builds (older `%APPDATA%\Claude` and package `LocalCache` locations are still checked), then falls back to the Claude Code CLI sign-in in `~/.claude/.credentials.json`. Expired and narrow-scope tokens are skipped. The endpoint is rate limited, so Claude is checked at most once every five minutes regardless of the refresh interval, a 429 stops that check instead of retrying other tokens, and the last good reading is shown as cached in the meantime. If no valid sign-in is found, open Claude Desktop or run `claude` to sign in again.
 
 Antigravity requires its existing local DevTools connection; when unavailable, its card reports the connection issue. The Codex / ChatGPT card shows the account's Codex limits, not ordinary ChatGPT conversation counts. It reads the actual limit windows returned for the signed-in account, so durations can vary by subscription (including ChatGPT Go) rather than assuming a fixed five-hour window.
 
