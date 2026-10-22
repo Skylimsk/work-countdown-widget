@@ -165,7 +165,7 @@ Sources: [JYP official notice (2016-09-23)](https://twice.jype.com/Mobile/Notice
 | Problem | Fix |
 |---|---|
 | Claude: *No valid Claude sign-in found* | Open Claude Desktop (or run `claude`) and sign in again |
-| Claude shows **Cached** | Normal. Claude is refreshed at most every 5 minutes |
+| Claude shows **Cached** | The last refresh failed, so the last good reading is shown. If every sign-in is rate limited, the card says when it will retry |
 | Codex card shows an error | Install the Codex desktop app and sign in |
 | Antigravity card shows an error | Open Antigravity so its local connection is available |
 | An AI card is missing | By default it follows its desktop app. Open the app, or set the card to **Always show** |
@@ -211,7 +211,7 @@ tests/      Unit tests
 1. Claude Desktop's data folder: `%LOCALAPPDATA%\Claude-Data\<package>` on current builds (the older `%APPDATA%\Claude` and package `LocalCache` folders are still checked).
 2. Claude Code CLI: `~/.claude/.credentials.json`.
 
-Expired tokens and tokens without the required scope are skipped. If Anthropic answers *429 Too Many Requests*, that check stops instead of trying other tokens.
+Expired tokens are skipped, and the token that last worked is tried first. Anthropic rate-limits each token separately: a token that gets *429 Too Many Requests* is put on hold for the time Anthropic asks (usually up to ~30 min) and the next token is tried. Revoked or under-scoped tokens are skipped for 6 hours.
 </details>
 
 <details>

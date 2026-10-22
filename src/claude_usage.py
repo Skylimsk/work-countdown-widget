@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import ctypes
+import hashlib
 import json
 import logging
 import os
@@ -24,6 +25,11 @@ CLAUDE_USER_AGENT = "claude-code/1.0.0"
 
 HOME_CLAUDE_JSON = Path.home() / ".claude.json"
 HOME_CREDENTIALS = Path.home() / ".claude" / ".credentials.json"
+# Remembers which token last worked and which are cooling down, keyed by a
+# hash of the token (never the token itself), across runner processes.
+STATE_FILE = Path(tempfile.gettempdir()) / "workday-claude-usage-state.json"
+DEFAULT_RATE_LIMIT_COOLDOWN_S = 15 * 60
+REJECTED_TOKEN_COOLDOWN_S = 6 * 60 * 60
 
 
 class DATA_BLOB(ctypes.Structure):
@@ -207,12 +213,40 @@ def _request_usage(token: str) -> dict:
         return json.loads(resp.read().decode("utf-8"))
 
 
+def _fingerprint(token: str) -> str:
+    return hashlib.sha256(token.encode("utf-8")).hexdigest()[:16]
+
+
+def _load_state() -> dict:
+    try:
+        state = json.loads(STATE_FILE.read_text(encoding="utf-8"))
+        if isinstance(state, dict):
+            return state
+    except Exception:
+        pass
+    return {}
+
+
+def _save_state(state: dict) -> None:
+    try:
+        STATE_FILE.write_text(json.dumps(state), encoding="utf-8")
+    except Exception as exc:
+        logger.warning("Failed to save Claude usage state: %s", exc)
+
+
+def _retry_after_seconds(exc: urllib.error.HTTPError) -> int:
+    try:
+        return max(60, int(float(exc.headers.get("retry-after"))))
+    except (TypeError, ValueError):
+        return DEFAULT_RATE_LIMIT_COOLDOWN_S
+
+
 def fetch_claude_usage() -> dict:
     """Fetch live usage from the Anthropic OAuth API.
 
-    Each call is a fresh process (spawned by quotaService.js), so there is no
-    point caching in-process here — last-known-good caching across polls is
-    the Node-side Quota Engine's job (quotaService.js), not this script's.
+    The usage endpoint rate-limits each token separately, so a 429 on one
+    token puts only that token on hold (for its Retry-After) and the next
+    token is tried. The token that last worked is tried first.
     """
     account = get_account_info()
 
@@ -225,24 +259,38 @@ def fetch_claude_usage() -> dict:
             "error": "No valid Claude sign-in found. Open Claude Desktop or run `claude` to sign in again.",
         }
 
+    now = datetime.now().timestamp()
+    state = _load_state()
+    limited = {fp: t for fp, t in (state.get("limited") or {}).items() if t > now}
+    rejected = {fp: t for fp, t in (state.get("rejected") or {}).items() if t > now}
+    last_good = state.get("last_good")
+    candidates = sorted(candidate_tokens, key=lambda t: _fingerprint(t) != last_good)
+
     last_err = None
-    for token in candidate_tokens:
+    for token in candidates:
+        fp = _fingerprint(token)
+        if fp in limited or fp in rejected:
+            continue
         try:
             usage = _request_usage(token)
             if usage:
+                _save_state({"last_good": fp, "limited": limited, "rejected": rejected})
                 return {"usage": usage, "account": account, "status": "ok", "error": None}
         except urllib.error.HTTPError as exc:
             last_err = exc
-            # Rate limits apply per account, so trying other tokens only
-            # prolongs the 429. Bad/under-scoped tokens: try the next one.
             if exc.code == 429:
-                break
+                limited[fp] = now + _retry_after_seconds(exc)
+            elif exc.code in (401, 403):
+                rejected[fp] = now + REJECTED_TOKEN_COOLDOWN_S
         except Exception as exc:
             last_err = exc
 
-    return {
-        "usage": None,
-        "account": account,
-        "status": "error",
-        "error": str(last_err) if last_err else "Unknown error fetching Claude usage.",
-    }
+    _save_state({"last_good": last_good, "limited": limited, "rejected": rejected})
+    current = {_fingerprint(t) for t in candidates}
+    waits = [t for fp, t in limited.items() if fp in current]
+    if waits:
+        wait_min = max(1, round((min(waits) - now) / 60))
+        error = f"HTTP Error 429: Too Many Requests (Claude sign-ins are rate limited; retrying in about {wait_min} min)"
+    else:
+        error = str(last_err) if last_err else "No usable Claude sign-in right now."
+    return {"usage": None, "account": account, "status": "error", "error": error}

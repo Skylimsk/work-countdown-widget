@@ -77,9 +77,8 @@ function parseUsage(parsed) {
 function fetchClaudeProvider() {
   const now = Date.now();
   if (lastResult && now - lastAttemptAt < MIN_REFRESH_MS) {
-    if (lastResult.status === 'ok') {
-      return Promise.resolve({ ...lastResult, status: 'cached' });
-    }
+    // A reading from the last few minutes is still current, so keep it
+    // "ok"; the widget only labels data "Cached" when a refresh failed.
     return Promise.resolve(lastResult);
   }
 
@@ -115,8 +114,9 @@ function fetchClaudeProvider() {
       if (parsed.status !== 'ok' || !parsed.usage) {
         lastAttemptAt = Date.now();
         const message = parsed.error || 'Unknown Claude usage error';
+        const wait = /retrying in about (\d+) min/.exec(message);
         lastResult = envelope('error', {}, SOURCE, /429|too many requests/i.test(message)
-          ? 'Claude is rate limiting usage checks. Try again in a few minutes.'
+          ? `Claude is rate limiting usage checks. Retrying in ${wait ? `about ${wait[1]} min` : 'a few minutes'}.`
           : message);
         resolve(lastResult);
         return;
