@@ -13,6 +13,7 @@ const {loadConfig,saveConfig,configPath}=require('./store');
 const {fetchClaudeQuota,writeLog,logFile}=require('./quotaService');
 const {classifyProcesses}=require('./providers/activeApps');
 const {Caffeine}=require('./core/caffeine');
+const {CaffeineApp}=require('./core/caffeineApp');
 const {getSpotifyNowPlaying,spotifyPlayPause,spotifyNext,spotifyPrev}=require('./spotifyService');
 const spotifyAuth=require('./spotifyAuth');
 let mainWindow,settingsWindow,playlistWindow,tray,quitting=false,scanPending=false,quotaBusy=false,quotaAt=0;
@@ -78,6 +79,7 @@ const caffeine=new Caffeine(powerSaveBlocker,jiggle,state=>{
  if(!state.enabled&&loadConfig().enableKeepAwake)saveConfig({enableKeepAwake:false});
  if(lastCaffeineEnabled!==state.enabled){lastCaffeineEnabled=state.enabled;updateTray();}
 },Date.now,activityPulse);
+const caffeineApp=new CaffeineApp(undefined,Date.now,msg=>writeLog(msg));
 async function refreshQuota(){
  if(quotaBusy)return;
  quotaBusy=true;
@@ -131,6 +133,7 @@ app.whenReady().then(()=>{
  screen.on('display-removed',()=>{const a=screen.getPrimaryDisplay().workArea;mainWindow.setPosition(a.x+20,a.y+20);});
  setInterval(()=>caffeine.reconcile(),1000);
  if(!smokeDir){
+ caffeineApp.sync(loadConfig());setInterval(()=>caffeineApp.sync(loadConfig()),5000);
  scanApps();refreshQuota();
  setInterval(scanApps,6000);
  setInterval(()=>{if(Date.now()-quotaAt>=loadConfig().quotaRefresh*1000)refreshQuota();},5000);
@@ -138,7 +141,7 @@ app.whenReady().then(()=>{
  setInterval(()=>{const c=loadConfig();if(c.enableRest&&Date.now()-restAt>=c.restMinutes*60000&&!caffeine.locked){restAt=Date.now();new Notification({title:'Time for a break',body:'Stand up, stretch and rest your eyes for a minute.',silent:false}).show();}},30000);
  }
 });
-app.on('before-quit',()=>{quitting=true;clearTimeout(moveTimer);caffeine.dispose();});
+app.on('before-quit',()=>{quitting=true;clearTimeout(moveTimer);caffeine.dispose();caffeineApp.dispose();});
 app.on('window-all-closed',()=>{if(!quitting)app.quit();});
 
 // Spotify IPC Handlers

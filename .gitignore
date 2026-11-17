@@ -6,6 +6,8 @@ dist/
 dist2/
 dist_build/
 *.exe
+# Bundled Zhorn Caffeine (freeware) — kept in the repo so builds don't depend on Downloads
+!src/vendor/caffeine/caffeine64.exe
 *.nupkg
 RELEASES
 
